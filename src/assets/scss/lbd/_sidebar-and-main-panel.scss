@@ -226,14 +226,14 @@ body > .navbar-collapse{
     }
 
     &:after{
-       @include icon-gradient($new-purple, $purple-color-bottom);
+       @include icon-gradient($social-github, $social-github);
        z-index: 3;
-       opacity: 1;
+       opacity: 0.1;
     }
 
     &[data-image]:after,
     &.has-image:after{
-        opacity: .77;
+        opacity: .1;
     }
 
     &[data-color="black"]:after{

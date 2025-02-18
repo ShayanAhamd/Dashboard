@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, Link } from "react-router-dom";
 import { Navbar, Container, Nav, Dropdown, Button } from "react-bootstrap";
 
 import routes from "routes.js";
@@ -20,12 +20,15 @@ function Header() {
 
   const getBrandText = () => {
     for (let i = 0; i < routes.length; i++) {
-      if (location.pathname.indexOf(routes[i].layout + routes[i].path) !== -1) {
+      const fullPath =
+        (routes[i].layout ? routes[i].layout : "") + routes[i].path;
+      if (location.pathname === fullPath) {
         return routes[i].name;
       }
     }
     return "Brand";
   };
+
   return (
     <Navbar bg="light" expand="lg">
       <Container fluid>
@@ -111,11 +114,7 @@ function Header() {
               </Dropdown.Menu>
             </Dropdown> */}
             <Nav.Item>
-              <Nav.Link
-                className="m-0"
-                href="#pablo"
-                onClick={(e) => e.preventDefault()}
-              >
+              <Nav.Link as={Link} to="/admin-login" className="m-0">
                 <span className="no-icon">Log out</span>
               </Nav.Link>
             </Nav.Item>
