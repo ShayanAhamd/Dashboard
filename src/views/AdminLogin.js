@@ -82,7 +82,6 @@ function AdminLogin() {
             <br />
             <form autoComplete="off" className="form-group">
               <input
-                required
                 type="email"
                 value={email}
                 className="form-control"
@@ -91,7 +90,6 @@ function AdminLogin() {
               />
               <br />
               <input
-                required
                 type="password"
                 value={password}
                 placeholder="Password"
@@ -99,7 +97,8 @@ function AdminLogin() {
                 onChange={(e) => setPassword(e.target.value)}
               />
               <br />
-              <button
+              <Link
+                to="/admin/dashboard"
                 type="submit"
                 className="btn w-100 text-white"
                 style={{
@@ -109,7 +108,7 @@ function AdminLogin() {
                 }}
               >
                 LOGIN
-              </button>
+              </Link>
             </form>
           </div>
         </div>
