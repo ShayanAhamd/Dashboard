@@ -60,17 +60,12 @@ function Signup() {
     <>
       {/* {user?.isAdmin && <Navbar user={user} />}
       <ToastContainer /> */}
-      <div
-        className="container-fluid pt-5"
-        style={{
-          backgroundRepeat: "round",
-          backgroundSize: "cover",
-          backgroundImage:
-            "url(" + require("assets/img/is-background.png") + ")",
-        }}
-      >
+      <div className="container-fluid pt-5 is-cable-bg">
         <div className="row px-4 py-3 d-center mt-3">
-          <div className="col-4 border bg-white shadow rounded">
+          <div
+            className="col-4 border bg-white shadow"
+            style={{ borderRadius: "20px" }}
+          >
             <div className="d-center pt-3">
               <img
                 src={require("assets/img/logo.png")}
@@ -87,26 +82,55 @@ function Signup() {
                 Full Name
               </label>
               <input
+                required
                 type="text"
+                value={name}
+                className="form-control"
+                placeholder="Full Name"
+                onChange={(e) => setName(e.target.value)}
+              />
+              <label className="mb-0 mt-2" htmlFor="email">
+                Email
+              </label>
+              <input
+                type="email"
                 className="form-control"
                 required
-                onChange={(e) => setName(e.target.value)}
-                value={name}
+                onChange={(e) => setEmail(e.target.value)}
+                value={email}
               />
-
+              <label className="mb-0 mt-2" htmlFor="password">
+                Password
+              </label>
+              <input
+                type="password"
+                className="form-control"
+                required
+                onChange={(e) => setPassword(e.target.value)}
+                value={password}
+              />
               <label className="mb-0 mt-2" htmlFor="cnic">
                 CNIC
               </label>
               <input
-                type="text"
-                className="form-control"
                 required
-                onChange={(e) => setCnic(e.target.value)}
+                type="text"
                 value={cnic}
                 maxLength={13}
+                className="form-control"
                 placeholder="12345-6789012-3"
+                onChange={(e) => setCnic(e.target.value)}
               />
-
+              <label className="mb-0 mt-2" htmlFor="cnic">
+                City
+              </label>
+              <input
+                required
+                type="text"
+                placeholder="City"
+                className="form-control"
+                onChange={(e) => setCnic(e.target.value)}
+              />
               <label className="mb-0 mt-2" htmlFor="phone">
                 Phone Number
               </label>
@@ -118,38 +142,16 @@ function Signup() {
                 value={phone}
                 placeholder="03XX-XXXXXXX"
               />
-
               <label className="mb-0 mt-2" htmlFor="dealerName">
                 Dealer Name
               </label>
               <input
+                required
                 type="text"
-                className="form-control"
-                required
-                onChange={(e) => setDealerName(e.target.value)}
                 value={dealerName}
-              />
-
-              <label className="mb-0 mt-2" htmlFor="email">
-                Email
-              </label>
-              <input
-                type="email"
                 className="form-control"
-                required
-                onChange={(e) => setEmail(e.target.value)}
-                value={email}
-              />
-
-              <label className="mb-0 mt-2" htmlFor="password">
-                Password
-              </label>
-              <input
-                type="password"
-                className="form-control"
-                required
-                onChange={(e) => setPassword(e.target.value)}
-                value={password}
+                placeholder="Dealer Name"
+                onChange={(e) => setDealerName(e.target.value)}
               />
               <br />
               <button

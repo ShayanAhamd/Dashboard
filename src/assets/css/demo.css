@@ -822,3 +822,14 @@
   transform: translateY(-5px) !important;
   box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2) !important;
 }
+
+.is-cable-bg {
+  width: 100vw;
+  height: auto;
+  min-height: 100vh;
+  background-size: cover;
+  background-attachment: fixed;
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-image: url("../img/is-background.png");
+}

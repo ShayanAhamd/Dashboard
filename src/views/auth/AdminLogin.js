@@ -54,15 +54,7 @@ function AdminLogin() {
     <>
       {/* {user?.isAdmin && <Navbar user={user} />} */}
       {/* <ToastContainer /> */}
-      <div
-        className="container-fluid pt-5"
-        style={{
-          backgroundRepeat: "round",
-          backgroundSize: "cover",
-          backgroundImage:
-            "url(" + require("assets/img/is-background.png") + ")",
-        }}
-      >
+      <div className="container-fluid pt-5 is-cable-bg">
         <div className="row px-4 py-3 d-center mt-3">
           <div
             className="col-4 border bg-white shadow"

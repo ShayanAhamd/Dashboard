@@ -53,16 +53,7 @@ function UserVerificationHistory() {
     <>
       {/* {user?.isAdmin && <Navbar user={user} />} */}
       {/* <ToastContainer /> */}
-      <div
-        className="container-fluid pt-3"
-        style={{
-          backgroundRepeat: "round",
-          backgroundSize: "cover",
-          backgroundImage:
-            "url(" + require("assets/img/is-background.png") + ")",
-          height: "100vh",
-        }}
-      >
+      <div className="container-fluid pt-3 is-cable-bg">
         <br />
         <div className="row px-4 py-3 d-center">
           <div className="col-8 bg-transparent d-space-between">
@@ -70,7 +61,7 @@ function UserVerificationHistory() {
             <Link
               to="/edit-user"
               type="submit"
-              className="btn btn btn-primary"
+              className="btn btn btn-primary text-white"
               style={{
                 fontSize: 12,
                 border: "none",
@@ -89,20 +80,18 @@ function UserVerificationHistory() {
                       <Table className="table-hover table-striped">
                         <thead>
                           <tr>
-                            <th className="border-0">Date</th>
+                            <th className="border-0 pl-4">Date</th>
                             <th className="border-0">Code</th>
                             <th className="border-0">Status</th>
-                            <th className="border-0">Actions</th>
+                            <th className="border-0">Point</th>
                           </tr>
                         </thead>
                         <tbody>
                           <tr>
-                            <td>2024-02-20</td>
+                            <td className="pl-4">2024-02-20</td>
                             <td>ABC123</td>
                             <td className="text-success">Verified</td>
-                            <td className="pl-4">
-                              <i className="fas fa-ellipsis-v"></i>
-                            </td>
+                            <td className="pl-4">23</td>
                           </tr>
                         </tbody>
                       </Table>
