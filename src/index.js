@@ -8,12 +8,12 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import "@fortawesome/fontawesome-free/css/all.min.css";
 import "./assets/scss/light-bootstrap-dashboard-react.scss?v=2.0.0";
 
-import Login from "views/Login.js";
-import Signup from "views/Signup.js";
-import AdminLogin from "views/AdminLogin";
+import Login from "views/auth/Login";
+import Signup from "views/auth/Signup";
 import AdminLayout from "layouts/Admin.js";
-import UserVerificationHistory from "views/UserVerificationHistory";
-import EditUser from "views/EditUser";
+import EditUser from "views/user/EditUser";
+import AdminLogin from "views/auth/AdminLogin";
+import UserVerificationHistory from "views/user/UserVerificationHistory";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 

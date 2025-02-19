@@ -64,7 +64,10 @@ function AdminLogin() {
         }}
       >
         <div className="row px-4 py-3 d-center mt-3">
-          <div className="col-4 border bg-white shadow rounded">
+          <div
+            className="col-4 border bg-white shadow"
+            style={{ borderRadius: "20px" }}
+          >
             <div className="d-center pt-3">
               <img
                 src={require("assets/img/logo.png")}
