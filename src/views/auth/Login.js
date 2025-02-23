@@ -7,8 +7,6 @@ function Login() {
   const location = useLocation();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [verificationCode, setVerificationCode] = useState("");
 
   const validateForm = () => {
     if (!email || !password) {
@@ -37,27 +35,16 @@ function Login() {
     if (foundUser) {
       localStorage.setItem("loggedInUser", JSON.stringify(foundUser));
       toast.success("Login Successful!");
-      console.log("location.pathname", location.pathname);
 
-      // If current route is admin-login, redirect immediately
-      if (location.pathname === "/admin-login") {
-        setTimeout(() => navigate("/admin-dashboard"), 2000); // Redirect to admin dashboard
-      } else {
-        setIsLoggedIn(true); // Normal users need verification
-      }
+      setTimeout(() => {
+        if (location.pathname === "/admin-login") {
+          navigate("/admin-dashboard");
+        } else {
+          navigate("/user-history");
+        }
+      }, 2000);
     } else {
       toast.error("Invalid email or password.");
-    }
-  };
-
-  const handleVerification = () => {
-    const correctCode = "123456"; // Simulated correct verification code
-
-    if (verificationCode === correctCode) {
-      toast.success("Verification Successful!");
-      setTimeout(() => navigate("/user-history"), 2000);
-    } else {
-      toast.error("Invalid verification code. Please try again.");
     }
   };
 
@@ -83,71 +70,47 @@ function Login() {
               className="text-center pt-md-0 pt-3 mt-3 mb-0"
               style={{ fontWeight: "bolder" }}
             >
-              {isLoggedIn ? "Verify Your Account" : "Login to your account"}
+              Login to your account
             </h4>
             <br />
 
-            {!isLoggedIn ? (
-              // Login Form
-              <form
-                autoComplete="off"
-                className="form-group"
-                onSubmit={handleLogin}
+            <form
+              autoComplete="off"
+              className="form-group"
+              onSubmit={handleLogin}
+            >
+              <input
+                type="email"
+                value={email}
+                className="form-control"
+                required
+                placeholder="Email Address"
+                onChange={(e) => setEmail(e.target.value)}
+              />
+              <br />
+              <input
+                type="password"
+                value={password}
+                placeholder="Password"
+                className="form-control"
+                required
+                onChange={(e) => setPassword(e.target.value)}
+              />
+              <br />
+              <button
+                type="submit"
+                className="btn w-100 text-white"
+                style={{
+                  fontSize: 12,
+                  border: "none",
+                  backgroundColor: "rgb(26 54 93)",
+                }}
               >
-                <input
-                  type="email"
-                  value={email}
-                  className="form-control"
-                  required
-                  placeholder="Email Address"
-                  onChange={(e) => setEmail(e.target.value)}
-                />
-                <br />
-                <input
-                  type="password"
-                  value={password}
-                  placeholder="Password"
-                  className="form-control"
-                  required
-                  onChange={(e) => setPassword(e.target.value)}
-                />
-                <br />
-                <button
-                  type="submit"
-                  className="btn w-100 text-white"
-                  style={{
-                    fontSize: 12,
-                    border: "none",
-                    backgroundColor: "rgb(26 54 93)",
-                  }}
-                >
-                  LOGIN
-                </button>
-              </form>
-            ) : (
-              <div>
-                <input
-                  type="text"
-                  value={verificationCode}
-                  placeholder="Enter Verification Code"
-                  className="form-control"
-                  onChange={(e) => setVerificationCode(e.target.value)}
-                />
-                <br />
-                <button
-                  className="btn w-100 text-white mb-3"
-                  style={{
-                    fontSize: 12,
-                    border: "none",
-                    backgroundColor: "rgb(26 54 93)",
-                  }}
-                  onClick={handleVerification}
-                >
-                  VERIFY CODE
-                </button>
-              </div>
-            )}
-            {!isLoggedIn && location.pathname !== "/admin-login" && (
+                LOGIN
+              </button>
+            </form>
+
+            {location.pathname !== "/admin-login" && (
               <span
                 className="d-center pb-3 pt-1"
                 style={{ color: "#1a365d", fontSize: 13, whiteSpace: "nowrap" }}
