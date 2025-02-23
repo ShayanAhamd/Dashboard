@@ -10,6 +10,7 @@ import {
   Button,
   FormCheck,
 } from "react-bootstrap";
+import { exportToCSV } from "utils/genralHelper";
 
 function GenerateCode() {
   const [generatedCode, setGeneratedCode] = useState("");
@@ -167,13 +168,26 @@ function GenerateCode() {
         <Row>
           <Col md="12">
             <Card className="strpied-tabled-with-hover">
-              <Card.Header>
+              <Card.Header className="d-space-between">
                 <Card.Title className="text-left">
                   <h4 className="mt-1 d-start">
                     <i className="nc-icon nc-bullet-list-67 text-primary pr-2"></i>
                     <span>Generated Codes</span>
                   </h4>
                 </Card.Title>
+                {codesList.length > 0 && (
+                  <Card.Title className="mr-4" as="h6">
+                    <Button
+                      variant="success"
+                      onClick={() =>
+                        exportToCSV(codesList, "generated_codes.csv")
+                      }
+                      disabled={codesList.length === 0}
+                    >
+                      Download CSV
+                    </Button>
+                  </Card.Title>
+                )}
               </Card.Header>
               <Card.Body className="table-full-width table-responsive px-0">
                 <Table className="table-hover table-striped">
