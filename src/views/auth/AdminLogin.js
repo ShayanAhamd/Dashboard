@@ -7,8 +7,6 @@ function AdminLogin() {
   const [email, setEmail] = useState("");
   const [error, setError] = useState("");
   const [user, setUser] = useState(null);
-  console.log("user", user);
-
   const [password, setPassword] = useState("");
 
   // useEffect(() => {

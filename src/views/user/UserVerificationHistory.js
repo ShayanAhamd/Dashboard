@@ -58,18 +58,31 @@ function UserVerificationHistory() {
         <div className="row px-4 py-3 d-center">
           <div className="col-8 bg-transparent d-space-between">
             <h3 style={{ fontWeight: "bolder" }}>Verification History</h3>
-            <Link
-              to="/edit-user"
-              type="submit"
-              className="btn btn btn-primary text-white"
-              style={{
-                fontSize: 12,
-                border: "none",
-                backgroundColor: "rgb(26 54 93)",
-              }}
-            >
-              Profile
-            </Link>
+            <div>
+              <Link
+                to="/edit-user"
+                type="submit"
+                className="btn btn btn-primary text-white"
+                style={{
+                  fontSize: 12,
+                  border: "none",
+                  backgroundColor: "rgb(26 54 93)",
+                }}
+              >
+                Profile
+              </Link>
+              <Link
+                to="/edit-user"
+                type="submit"
+                className="btn btn btn-danger text-white ml-2"
+                style={{
+                  fontSize: 12,
+                  border: "none",
+                }}
+              >
+                Logout
+              </Link>
+            </div>
           </div>
           <div className="col-8 bg-transparent d-space-between">
             <Container fluid>

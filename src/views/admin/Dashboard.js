@@ -1,6 +1,5 @@
 import React from "react";
 import ChartistGraph from "react-chartist";
-// react-bootstrap components
 import {
   Badge,
   Button,
@@ -22,7 +21,13 @@ function Dashboard() {
       <Container fluid>
         <Row>
           <Col lg="3" sm="6">
-            <Card className="card-stats hover-effect">
+            <Card
+              className="card-stats hover-effect"
+              style={{
+                background: "linear-gradient(135deg, #fceabb, #f8b500)",
+                color: "#fff",
+              }}
+            >
               <Card.Body>
                 <Row>
                   <Col xs="5">
@@ -39,8 +44,8 @@ function Dashboard() {
                 </Row>
               </Card.Body>
               <Card.Footer>
-                <hr></hr>
-                <div className="stats">Active Registerd Users</div>
+                <hr />
+                <div className="stats">Active Registered Users</div>
                 <div className="stats">
                   <i className="fas fa-redo mr-1"></i>
                   Update Now
@@ -48,8 +53,15 @@ function Dashboard() {
               </Card.Footer>
             </Card>
           </Col>
+
           <Col lg="3" sm="6">
-            <Card className="card-stats hover-effect">
+            <Card
+              className="card-stats hover-effect"
+              style={{
+                background: "linear-gradient(135deg, #a1c4fd, #c2e9fb)",
+                color: "#fff",
+              }}
+            >
               <Card.Body>
                 <Row>
                   <Col xs="5">
@@ -66,7 +78,7 @@ function Dashboard() {
                 </Row>
               </Card.Body>
               <Card.Footer>
-                <hr></hr>
+                <hr />
                 <div className="stats">Users joined this week</div>
                 <div className="stats">
                   <i className="fas fa-redo mr-1"></i>
@@ -75,8 +87,15 @@ function Dashboard() {
               </Card.Footer>
             </Card>
           </Col>
+
           <Col lg="3" sm="6">
-            <Card className="card-stats hover-effect">
+            <Card
+              className="card-stats hover-effect"
+              style={{
+                background: "linear-gradient(135deg, #d4fc79, #96e6a1)",
+                color: "#fff",
+              }}
+            >
               <Card.Body>
                 <Row>
                   <Col xs="5">
@@ -93,7 +112,7 @@ function Dashboard() {
                 </Row>
               </Card.Body>
               <Card.Footer>
-                <hr></hr>
+                <hr />
                 <div className="stats">Total verifications completed</div>
                 <div className="stats">
                   <i className="fas fa-redo mr-1"></i>
@@ -102,8 +121,15 @@ function Dashboard() {
               </Card.Footer>
             </Card>
           </Col>
+
           <Col lg="3" sm="6">
-            <Card className="card-stats hover-effect">
+            <Card
+              className="card-stats hover-effect"
+              style={{
+                background: "linear-gradient(135deg, #f093fb, #f5576c)",
+                color: "#fff",
+              }}
+            >
               <Card.Body>
                 <Row>
                   <Col xs="5">
@@ -120,7 +146,7 @@ function Dashboard() {
                 </Row>
               </Card.Body>
               <Card.Footer>
-                <hr></hr>
+                <hr />
                 <div className="stats">Currently active users</div>
                 <div className="stats">
                   <i className="fas fa-redo mr-1"></i>

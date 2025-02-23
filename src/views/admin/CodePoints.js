@@ -16,7 +16,7 @@ function CodePoints() {
                       <p className="card-category text-warning">
                         Basic QR Generator
                       </p>
-                      <Card.Title as="h4">150</Card.Title>
+                      <Card.Title as="h4">50</Card.Title>
                     </div>
                   </Col>
                   <Col xs="3">
@@ -39,9 +39,9 @@ function CodePoints() {
                   <Col xs="9">
                     <div className="numbers text-left">
                       <p className="card-category text-primary">
-                        Basic QR Generator
+                        Premium QR Generator
                       </p>
-                      <Card.Title as="h4">150</Card.Title>
+                      <Card.Title as="h4">100</Card.Title>
                     </div>
                   </Col>
                   <Col xs="3">
