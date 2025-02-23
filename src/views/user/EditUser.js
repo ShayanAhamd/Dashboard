@@ -1,5 +1,5 @@
 // import { Navbar } from "./Navbar";
-import { Link, useHistory } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 // import { auth, db } from "../Config/Config";
 import React, { useEffect, useState } from "react";
 // import { ToastContainer, toast } from "react-toastify";
@@ -13,7 +13,7 @@ function EditUser() {
   const [dealerName, setDealerName] = useState("");
   const [error, setError] = useState("");
   const [user, setUser] = useState(null);
-  const navigate = useHistory();
+  const navigate = useNavigate();
 
   // useEffect(() => {
   //   const unsubscribe = auth.onAuthStateChanged((currentUser) => {
@@ -60,9 +60,12 @@ function EditUser() {
     <>
       {/* {user?.isAdmin && <Navbar user={user} />}
       <ToastContainer /> */}
-      <div className="container-fluid pt-5 is-cable-bg">
-        <div className="row px-4 py-3 d-center mt-3">
-          <div className="col-4 border bg-white shadow rounded">
+      <div className="container-fluid is-cable-bg">
+        <div className="row px-4 py-3 d-center">
+          <div
+            className="col-md-7 col-12 border bg-white shadow"
+            style={{ borderRadius: "20px" }}
+          >
             <div className="d-center pt-3">
               <img
                 src={require("assets/img/logo-red.png")}
@@ -78,73 +81,95 @@ function EditUser() {
               Edit Your Profile
             </h4>
             <form autoComplete="off" className="form-group">
-              <input
-                required
-                type="text"
-                value={name}
-                placeholder="Full Name"
-                className="form-control"
-                onChange={(e) => setName(e.target.value)}
-              />
-              <br />
-              <input
-                required
-                disabled
-                type="email"
-                value={cnic}
-                maxLength={13}
-                className="form-control"
-                placeholder="Email"
-                onChange={(e) => setCnic(e.target.value)}
-              />
-              <br />
-              <input
-                required
-                disabled
-                type="text"
-                value={cnic}
-                maxLength={13}
-                className="form-control"
-                placeholder="CNIC"
-                onChange={(e) => setCnic(e.target.value)}
-              />
-              <br />
-              <input
-                type="text"
-                className="form-control"
-                required
-                onChange={(e) => setPhone(e.target.value)}
-                value={phone}
-                placeholder="Phone Number"
-              />
-              <br />
-              <input
-                required
-                type="text"
-                value={dealerName}
-                placeholder="Dealer Name"
-                className="form-control"
-                onChange={(e) => setDealerName(e.target.value)}
-              />
-              <br />
-              <button
-                type="submit"
-                className="btn w-100 text-white"
-                style={{
-                  fontSize: 12,
-                  border: "none",
-                  backgroundColor: "rgb(26 54 93)",
-                }}
-              >
-                SIGN UP
-              </button>
+              <div className="row">
+                <div className="col-md-6 col-12">
+                  <label className="mb-0 mt-2">Full Name</label>
+                  <input
+                    required
+                    type="text"
+                    value={name}
+                    placeholder="Full Name"
+                    className="form-control"
+                    onChange={(e) => setName(e.target.value)}
+                  />
+                </div>
+                <div className="col-md-6 col-12">
+                  <label className="mb-0 mt-2">Email</label>
+                  <input
+                    required
+                    disabled
+                    type="email"
+                    value={cnic}
+                    maxLength={13}
+                    className="form-control"
+                    placeholder="Email"
+                    onChange={(e) => setCnic(e.target.value)}
+                  />
+                </div>
+              </div>
+              <div className="row">
+                <div className="col-md-6 col-12">
+                  <label className="mb-0 mt-2">CNIC</label>
+                  <input
+                    required
+                    disabled
+                    type="text"
+                    value={cnic}
+                    maxLength={13}
+                    className="form-control"
+                    placeholder="CNIC"
+                    onChange={(e) => setCnic(e.target.value)}
+                  />
+                </div>
+                <div className="col-md-6 col-12">
+                  <label className="mb-0 mt-2">City</label>
+                  <input
+                    type="text"
+                    placeholder="City"
+                    className="form-control"
+                    required
+                    onChange={(e) => setCnic(e.target.value)}
+                  />
+                </div>
+              </div>
+              <div className="row">
+                <div className="col-md-6 col-12">
+                  <label className="mb-0 mt-2">Address</label>
+                  <input
+                    required
+                    type="text"
+                    value={dealerName}
+                    placeholder="Dealer Name"
+                    className="form-control"
+                    onChange={(e) => setDealerName(e.target.value)}
+                  />
+                </div>
+                <div className="col-md-6 col-12">
+                  <label className="mb-0 mt-2">Phone Number</label>
+                  <input
+                    type="text"
+                    className="form-control"
+                    required
+                    onChange={(e) => setPhone(e.target.value)}
+                    value={phone}
+                    placeholder="Phone Number"
+                  />
+                </div>
+              </div>
+              <div className="d-end">
+                <button
+                  type="submit"
+                  className="btn w-25 text-white mb-3 mt-2"
+                  style={{
+                    fontSize: 12,
+                    border: "none",
+                    backgroundColor: "rgb(26 54 93)",
+                  }}
+                >
+                  Update
+                </button>
+              </div>
             </form>
-            <span className="d-center pb-3" style={{ color: "#1a365d" }}>
-              Already have an account?{" "}
-              <Link className="text-dark fw-bolder" to="/login">
-                Login
-              </Link>
-            </span>
           </div>
         </div>
       </div>

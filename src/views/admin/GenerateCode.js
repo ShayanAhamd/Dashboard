@@ -108,7 +108,7 @@ function GenerateCode() {
                   </Card.Title>
                 )}
               </Card.Header>
-              <Card.Body className="table-full-width table-responsive px-0">
+              <Card.Body className="table-full-width table-responsive px-5">
                 <Row>
                   <Col className="px-1 pl-5" md="5">
                     <Form.Group>
@@ -149,9 +149,9 @@ function GenerateCode() {
                       Generate
                     </Button>
                   </Col>
-                  <Col className="px-5 pt-3 pl-3" md="12">
+                  <Col className="pt-3 px-0" md="12">
                     <Button
-                      className="btn-fill pull-right w-100 px-5"
+                      className="btn-fill pull-right w-100"
                       variant="info"
                       onClick={handleSave}
                       disabled={!generatedCode}
@@ -195,7 +195,7 @@ function GenerateCode() {
                     <tr>
                       <th>#</th>
                       <th>Code</th>
-                      <th>Points</th> {/* New column for points */}
+                      <th>Points</th>
                       <th>Created At</th>
                       <th>Status</th>
                       <th>Actions</th>
@@ -207,7 +207,7 @@ function GenerateCode() {
                         <tr key={index}>
                           <td>{index + 1}</td>
                           <td>{item.code}</td>
-                          <td>{item.points}</td> {/* Display points */}
+                          <td>{item.points}</td>
                           <td>{item.createdAt}</td>
                           <td>
                             <label className="switch">

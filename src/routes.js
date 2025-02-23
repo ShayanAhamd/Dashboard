@@ -1,15 +1,3 @@
-// import Login from "views/Login";
-// import Users from "views/Users";
-// import Signup from "views/Signup";
-// import History from "views/History";
-// import AdminLogin from "views/AdminLogin";
-// import CodePoints from "views/CodePoints";
-// import Dashboard from "views/Dashboard.js";
-// import GenerateCode from "views/GenerateCode.js";
-// import AdminProfile from "views/AdminProfile.js";
-// import UserVerificationHistory from "views/UserVerificationHistory";
-// import EditUser from "views/EditUser";
-
 import AdminProfile from "views/admin/AdminProfile";
 import CodePoints from "views/admin/CodePoints";
 import Dashboard from "views/admin/Dashboard";

@@ -1,5 +1,5 @@
-import React, { Component } from "react";
-import { useLocation, Route, Switch } from "react-router-dom";
+import React from "react";
+import { useLocation, Route, Routes } from "react-router-dom";
 
 import AdminNavbar from "components/Navbars/AdminNavbar";
 import Footer from "components/Footer/Footer";
@@ -10,47 +10,47 @@ import routes from "routes.js";
 function Admin() {
   const location = useLocation();
   const mainPanel = React.useRef(null);
+
   const getRoutes = (routes) => {
     return routes.map((prop, key) => {
       if (prop.layout === "/admin") {
-        return (
-          <Route
-            path={prop.layout + prop.path}
-            render={(props) => <prop.component {...props} />}
-            key={key}
-          />
-        );
-      } else {
-        return null;
+        const Component = prop.component;
+        return <Route path={prop.path} element={<Component />} key={key} />;
       }
+      return null;
     });
   };
+
   React.useEffect(() => {
     document.documentElement.scrollTop = 0;
-    document.scrollingElement.scrollTop = 0;
-    mainPanel.current.scrollTop = 0;
+    (document.scrollingElement || document.documentElement).scrollTop = 0;
+    if (mainPanel.current) {
+      mainPanel.current.scrollTop = 0;
+    }
+
     if (
       window.innerWidth < 993 &&
-      document.documentElement.className.indexOf("nav-open") !== -1
+      document.documentElement.classList.contains("nav-open")
     ) {
       document.documentElement.classList.toggle("nav-open");
-      var element = document.getElementById("bodyClick");
-      element.parentNode.removeChild(element);
+      const element = document.getElementById("bodyClick");
+      if (element) {
+        element.parentNode.removeChild(element);
+      }
     }
   }, [location]);
+
   return (
-    <>
-      <div className="wrapper">
-        <Sidebar routes={routes} />
-        <div className="main-panel" ref={mainPanel}>
-          <AdminNavbar />
-          <div className="content">
-            <Switch>{getRoutes(routes)}</Switch>
-          </div>
-          <Footer />
+    <div className="wrapper">
+      <Sidebar routes={routes} />
+      <div className="main-panel" ref={mainPanel}>
+        <AdminNavbar />
+        <div className="content">
+          <Routes>{getRoutes(routes)}</Routes>
         </div>
+        <Footer />
       </div>
-    </>
+    </div>
   );
 }
 

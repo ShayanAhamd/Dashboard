@@ -1,6 +1,11 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
-import { BrowserRouter, Route, Switch, Redirect } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+} from "react-router-dom";
 
 import "./assets/css/demo.css";
 import "./assets/css/animate.min.css";
@@ -18,15 +23,16 @@ import UserVerificationHistory from "views/user/UserVerificationHistory";
 const root = ReactDOM.createRoot(document.getElementById("root"));
 
 root.render(
-  <BrowserRouter>
-    <Switch>
-      <Route path="/login" exact component={Login} />
-      <Route path="/signup" exact component={Signup} />
-      <Route path="/admin-login" exact component={AdminLogin} />
-      <Route path="/edit-user" exact component={EditUser} />
-      <Route path="/user-history" exact component={UserVerificationHistory} />
-      <Route path="/admin" render={(props) => <AdminLayout {...props} />} />
-      <Redirect from="/" to="/login" />
-    </Switch>
-  </BrowserRouter>
+  <Router>
+    <Routes>
+      <Route path="/login" element={<Login />} />
+      <Route path="/signup" element={<Signup />} />
+      <Route path="/admin-login" element={<AdminLogin />} />
+      <Route path="/edit-user" element={<EditUser />} />
+      <Route path="/user-history" element={<UserVerificationHistory />} />
+      <Route path="/admin/*" element={<AdminLayout />} />
+      {/* Redirect unknown routes to login */}
+      <Route path="*" element={<Navigate to="/login" />} />
+    </Routes>
+  </Router>
 );

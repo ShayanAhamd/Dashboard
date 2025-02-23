@@ -1,9 +1,9 @@
-import { Link, useHistory, useLocation } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import React, { useState } from "react";
 import { ToastContainer, toast } from "react-toastify";
 
 function Login() {
-  const navigate = useHistory();
+  const navigate = useNavigate();
   const location = useLocation();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -68,7 +68,7 @@ function Login() {
         <br />
         <div className="row px-4 py-3 d-center mt-3">
           <div
-            className="col-4 border bg-white shadow"
+            className="col-md-4 col-12 border bg-white shadow"
             style={{ borderRadius: "20px" }}
           >
             <div className="d-center pt-3">
@@ -125,7 +125,6 @@ function Login() {
                 </button>
               </form>
             ) : (
-              // Verification Code Form (only for normal users)
               <div>
                 <input
                   type="text"
@@ -148,9 +147,11 @@ function Login() {
                 </button>
               </div>
             )}
-
             {!isLoggedIn && location.pathname !== "/admin-login" && (
-              <span className="d-center pb-3" style={{ color: "#1a365d" }}>
+              <span
+                className="d-center pb-3 pt-1"
+                style={{ color: "#1a365d", fontSize: 13, whiteSpace: "nowrap" }}
+              >
                 New to IS Cables & Fans?
                 <Link className="text-dark fw-bolder" to="/signup">
                   {" "}

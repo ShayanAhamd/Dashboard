@@ -1,4 +1,4 @@
-import { Link, useHistory } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import React, { useState } from "react";
 import { ToastContainer, toast } from "react-toastify";
 
@@ -10,7 +10,7 @@ function Signup() {
   const [cnic, setCnic] = useState("");
   const [phone, setPhone] = useState("");
   const [dealerName, setDealerName] = useState("");
-  const navigate = useHistory();
+  const navigate = useNavigate();
 
   const formatCNIC = (value) => {
     const numericValue = value.replace(/\D/g, "").slice(0, 13);
@@ -116,10 +116,10 @@ function Signup() {
   return (
     <>
       <ToastContainer />
-      <div className="container-fluid pt-5 is-cable-bg">
-        <div className="row px-4 py-3 d-center mt-3">
+      <div className="container-fluid is-cable-bg">
+        <div className="row px-4 py-3 d-center">
           <div
-            className="col-4 border bg-white shadow"
+            className="col-md-7 col-12 border bg-white shadow"
             style={{ borderRadius: "20px" }}
           >
             <div className="d-center pt-3">
@@ -134,73 +134,100 @@ function Signup() {
               CREATE YOUR ACCOUNT
             </h5>
             <form autoComplete="off" className="form-group" onSubmit={signup}>
-              <label className="mb-0 mt-2">Full Name</label>
-              <input
-                type="text"
-                value={name}
-                className="form-control"
-                required
-                placeholder="Full Name"
-                onChange={(e) => setName(e.target.value)}
-              />
-
-              <label className="mb-0 mt-2">Email</label>
-              <input
-                type="email"
-                className="form-control"
-                required
-                onChange={(e) => setEmail(e.target.value)}
-                value={email}
-              />
-
-              <label className="mb-0 mt-2">Password</label>
-              <input
-                type="password"
-                className="form-control"
-                required
-                onChange={(e) => setPassword(e.target.value)}
-                value={password}
-              />
-
-              <label className="mb-0 mt-2">Confirm Password</label>
-              <input
-                type="password"
-                className="form-control"
-                required
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                value={confirmPassword}
-              />
-
-              <label className="mb-0 mt-2">CNIC</label>
-              <input
-                type="text"
-                value={cnic}
-                className="form-control"
-                placeholder="12345-6789012-3"
-                maxLength={15}
-                required
-                onChange={handleCnicChange}
-              />
-
-              <label className="mb-0 mt-2">City</label>
-              <input
-                type="text"
-                placeholder="City"
-                className="form-control"
-                required
-                onChange={(e) => setCnic(e.target.value)}
-              />
-
-              <label className="mb-0 mt-2">Phone Number</label>
-              <input
-                type="text"
-                className="form-control"
-                required
-                onChange={(e) => setPhone(e.target.value.replace(/\D/g, ""))}
-                value={phone}
-                placeholder="03XXXXXXXXX"
-              />
-
+              <div className="row">
+                <div className="col-md-6 col-12">
+                  <label className="mb-0 mt-2">Full Name</label>
+                  <input
+                    type="text"
+                    value={name}
+                    className="form-control"
+                    required
+                    placeholder="Full Name"
+                    onChange={(e) => setName(e.target.value)}
+                  />
+                </div>
+                <div className="col-md-6 col-12">
+                  <label className="mb-0 mt-2">Email</label>
+                  <input
+                    type="email"
+                    className="form-control"
+                    required
+                    onChange={(e) => setEmail(e.target.value)}
+                    value={email}
+                  />
+                </div>
+              </div>
+              <div className="row">
+                <div className="col-md-6 col-12">
+                  <label className="mb-0 mt-2">Password</label>
+                  <input
+                    type="password"
+                    className="form-control"
+                    required
+                    onChange={(e) => setPassword(e.target.value)}
+                    value={password}
+                  />
+                </div>
+                <div className="col-md-6 col-12">
+                  <label className="mb-0 mt-2">Confirm Password</label>
+                  <input
+                    type="password"
+                    className="form-control"
+                    required
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    value={confirmPassword}
+                  />
+                </div>
+              </div>
+              <div className="row">
+                <div className="col-md-6 col-12">
+                  <label className="mb-0 mt-2">CNIC</label>
+                  <input
+                    type="text"
+                    value={cnic}
+                    className="form-control"
+                    placeholder="12345-6789012-3"
+                    maxLength={15}
+                    required
+                    onChange={handleCnicChange}
+                  />
+                </div>
+                <div className="col-md-6 col-12">
+                  <label className="mb-0 mt-2">City</label>
+                  <input
+                    type="text"
+                    placeholder="City"
+                    className="form-control"
+                    required
+                    onChange={(e) => setCnic(e.target.value)}
+                  />
+                </div>
+              </div>
+              <div className="row">
+                <div className="col-md-6 col-12">
+                  <label className="mb-0 mt-2">Address</label>
+                  <input
+                    type="text"
+                    placeholder="Address"
+                    className="form-control"
+                    required
+                    onChange={(e) => setCnic(e.target.value)}
+                  />
+                </div>
+                <div className="col-md-6 col-12">
+                  <label className="mb-0 mt-2">Phone Number</label>
+                  <input
+                    type="text"
+                    className="form-control"
+                    required
+                    onChange={(e) =>
+                      setPhone(e.target.value.replace(/\D/g, ""))
+                    }
+                    value={phone}
+                    placeholder="03XXXXXXXXX"
+                  />
+                </div>
+              </div>
               <label className="mb-0 mt-2">Dealer Name</label>
               <input
                 type="text"
@@ -224,8 +251,10 @@ function Signup() {
                 SIGN UP
               </button>
             </form>
-
-            <span className="d-center pb-3" style={{ color: "#1a365d" }}>
+            <span
+              className="d-center pb-3"
+              style={{ color: "#1a365d", fontSize: 13, whiteSpace: "nowrap" }}
+            >
               Already have an account?{" "}
               <Link className="text-dark fw-bolder" to="/login">
                 Login

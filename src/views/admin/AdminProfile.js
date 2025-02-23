@@ -17,9 +17,9 @@ function AdminProfile() {
               <Card.Body>
                 <Form>
                   <Row>
-                    <Col className="px-1 pl-3" md="6">
+                    <Col className="pl-1" md="6">
                       <Form.Group>
-                        <label>First Name</label>
+                        <label htmlFor="first name">First Name</label>
                         <Form.Control
                           defaultValue="first"
                           placeholder="First Name"
@@ -29,7 +29,7 @@ function AdminProfile() {
                     </Col>
                     <Col className="pl-1" md="6">
                       <Form.Group>
-                        <label htmlFor="exampleInputEmail1">Last Name</label>
+                        <label htmlFor="email">Last Name</label>
                         <Form.Control
                           defaultValue="last"
                           placeholder="Last Name"
@@ -73,14 +73,16 @@ function AdminProfile() {
                       </Form.Group>
                     </Col>
                   </Row>
-                  <Button
-                    className="btn-fill pull-right d-end"
-                    type="submit"
-                    variant="info"
-                  >
-                    Update Profile
-                  </Button>
-                  <div className="clearfix"></div>
+                  <div className="d-end mt-2">
+                    <Button
+                      className="btn-fill pull-right btn-sm"
+                      type="submit"
+                      variant="info"
+                    >
+                      Update Profile
+                    </Button>
+                    <div className="clearfix"></div>
+                  </div>
                 </Form>
               </Card.Body>
             </Card>

@@ -8,15 +8,17 @@ function CodePoints() {
         <h3 className="mt-0">QR Generator Types</h3>
         <Row>
           <Col lg="6" sm="12">
-            <Card className="card-stats hover-effect">
+            <Card className="card-stats hover-effect px-3">
               <Card.Body>
                 <Row>
                   <Col xs="9">
-                    <div className="numbers text-left">
-                      <p className="card-category text-warning">
+                    <div className="numbers">
+                      <p className="card-category text-warning text-start">
                         Basic QR Generator
                       </p>
-                      <Card.Title as="h4">50</Card.Title>
+                      <Card.Title className="text-start" as="h4">
+                        50
+                      </Card.Title>
                     </div>
                   </Col>
                   <Col xs="3">
@@ -33,15 +35,17 @@ function CodePoints() {
             </Card>
           </Col>
           <Col lg="6" sm="12">
-            <Card className="card-stats hover-effect">
+            <Card className="card-stats hover-effect px-3">
               <Card.Body>
                 <Row>
                   <Col xs="9">
-                    <div className="numbers text-left">
-                      <p className="card-category text-primary">
+                    <div className="numbers">
+                      <p className="card-category text-primary text-start">
                         Premium QR Generator
                       </p>
-                      <Card.Title as="h4">100</Card.Title>
+                      <Card.Title className="text-start" as="h4">
+                        100
+                      </Card.Title>
                     </div>
                   </Col>
                   <Col xs="3">

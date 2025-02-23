@@ -807,6 +807,12 @@
   align-items: center !important;
 }
 
+.d-end {
+  display: flex !important;
+  justify-content: right !important;
+  align-items: center !important;
+}
+
 .d-space-between {
   display: flex !important;
   justify-content: space-between !important;

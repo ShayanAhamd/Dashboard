@@ -41,11 +41,7 @@ function Sidebar({ routes }) {
                     }
                     key={key}
                   >
-                    <NavLink
-                      to={prop.layout + prop.path}
-                      className="nav-link"
-                      activeClassName="active"
-                    >
+                    <NavLink to={prop.layout + prop.path} className="nav-link">
                       <i className={prop.icon} />
                       <p>{prop.name}</p>
                     </NavLink>
