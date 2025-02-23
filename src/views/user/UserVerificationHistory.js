@@ -1,68 +1,63 @@
-// import { auth } from "../Config/Config";
 import { Link } from "react-router-dom";
 import React, { useState, useEffect } from "react";
-import { Card, Table, Container, Row, Col } from "react-bootstrap";
-// import { ToastContainer, toast } from "react-toastify";
+import {
+  Card,
+  Table,
+  Container,
+  Row,
+  Col,
+  Button,
+  Modal,
+  Form,
+} from "react-bootstrap";
 
 function UserVerificationHistory() {
-  const [email, setEmail] = useState("");
-  const [error, setError] = useState("");
-  const [user, setUser] = useState(null);
-  const [password, setPassword] = useState("");
+  const [showModal, setShowModal] = useState(false);
+  const [code, setCode] = useState("");
+  const [codes, setCodes] = useState([]);
 
-  // useEffect(() => {
-  //   const unsubscribe = auth.onAuthStateChanged((currentUser) => {
-  //     if (currentUser) {
-  //       setUser(currentUser);
-  //     } else {
-  //       setUser(null);
-  //     }
-  //   });
-  //   return () => unsubscribe();
-  // }, []);
+  useEffect(() => {
+    const savedCodes =
+      JSON.parse(localStorage.getItem("verificationCodes")) || [];
+    setCodes(savedCodes);
+  }, []);
 
-  // const login = (e) => {
-  //   e.preventDefault();
-  //   auth
-  //     .signInWithEmailAndPassword(email, password)
-  //     .then(() => {
-  //       setEmail("");
-  //       setPassword("");
-  //       setError("");
-  //       toast.success("Login Successfully");
-  //       setTimeout(() => props.history.push("/"), 3000);
-  //     })
-  //     .catch((err) => {
-  //       try {
-  //         const errorMessage =
-  //           JSON.parse(err.message)?.error?.message || "An error occurred";
-  //         setError(
-  //           errorMessage.charAt(0).toUpperCase() + errorMessage.slice(1)
-  //         );
-  //         toast.error(
-  //           errorMessage.charAt(0).toUpperCase() + errorMessage.slice(1)
-  //         );
-  //       } catch (error) {
-  //         console.log("Error parsing the error message:", error);
-  //         setError("An unexpected error occurred");
-  //       }
-  //     });
-  // };
+  const handleClose = () => setShowModal(false);
+  const handleShow = () => setShowModal(true);
+  const handleSave = () => {
+    const newCode = {
+      date: new Date().toISOString().split("T")[0],
+      code,
+      status: "Pending",
+      point: 0,
+    };
+    const updatedCodes = [...codes, newCode];
+    setCodes(updatedCodes);
+    localStorage.setItem("verificationCodes", JSON.stringify(updatedCodes));
+    setCode("");
+    setShowModal(false);
+  };
 
   return (
     <>
-      {/* {user?.isAdmin && <Navbar user={user} />} */}
-      {/* <ToastContainer /> */}
       <div className="container-fluid pt-3 is-cable-bg">
         <br />
         <div className="row px-4 py-3 d-center">
           <div className="col-8 bg-transparent d-space-between">
             <h3 style={{ fontWeight: "bolder" }}>Verification History</h3>
             <div>
+              <Button
+                variant="default"
+                className="btn-fill btn-sm"
+                style={{ marginRight: 8 }}
+                onClick={handleShow}
+              >
+                Add Code
+              </Button>
               <Link
                 to="/edit-user"
                 type="submit"
-                className="btn btn btn-primary text-white"
+                className="btn text-white"
                 style={{
                   fontSize: 12,
                   border: "none",
@@ -72,12 +67,15 @@ function UserVerificationHistory() {
                 Profile
               </Link>
               <Link
-                to="/edit-user"
+                to="/login"
                 type="submit"
-                className="btn btn btn-danger text-white ml-2"
+                className="btn text-dark"
                 style={{
                   fontSize: 12,
                   border: "none",
+                  marginLeft: 10,
+                  backgroundColor: "red",
+                  border: "1px solid black",
                 }}
               >
                 Logout
@@ -99,14 +97,20 @@ function UserVerificationHistory() {
                             <th className="border-0">Point</th>
                           </tr>
                         </thead>
-                        <tbody>
-                          <tr>
-                            <td className="pl-4">2024-02-20</td>
-                            <td>ABC123</td>
-                            <td className="text-success">Verified</td>
-                            <td className="pl-4">23</td>
-                          </tr>
-                        </tbody>
+                        {codes.length > 0 ? (
+                          <tbody>
+                            {codes.map((entry, index) => (
+                              <tr key={index}>
+                                <td className="pl-4">{entry.date}</td>
+                                <td>{entry.code}</td>
+                                <td className="text-warning">{entry.status}</td>
+                                <td className="pl-4">{entry.point}</td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        ) : (
+                          <div className="d-center">No codes added yet</div>
+                        )}
                       </Table>
                     </Card.Body>
                   </Card>
@@ -116,6 +120,34 @@ function UserVerificationHistory() {
           </div>
         </div>
       </div>
+
+      {/* Add Code Modal */}
+      <Modal show={showModal} onHide={handleClose}>
+        <Modal.Header closeButton>
+          <Modal.Title>Add Code</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <Form>
+            <Form.Group>
+              <Form.Label>Add Code</Form.Label>
+              <Form.Control
+                type="text"
+                value={code}
+                onChange={(e) => setCode(e.target.value)}
+                placeholder="Enter code"
+              />
+            </Form.Group>
+          </Form>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={handleClose}>
+            Cancel
+          </Button>
+          <Button variant="primary" onClick={handleSave}>
+            Save
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </>
   );
 }

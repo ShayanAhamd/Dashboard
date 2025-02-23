@@ -41,7 +41,7 @@ function Login() {
 
       // If current route is admin-login, redirect immediately
       if (location.pathname === "/admin-login") {
-        setTimeout(() => navigate.push("/admin-dashboard"), 2000); // Redirect to admin dashboard
+        setTimeout(() => navigate("/admin-dashboard"), 2000); // Redirect to admin dashboard
       } else {
         setIsLoggedIn(true); // Normal users need verification
       }
@@ -55,7 +55,7 @@ function Login() {
 
     if (verificationCode === correctCode) {
       toast.success("Verification Successful!");
-      setTimeout(() => navigate.push("/user-history"), 2000);
+      setTimeout(() => navigate("/user-history"), 2000);
     } else {
       toast.error("Invalid verification code. Please try again.");
     }
@@ -135,7 +135,7 @@ function Login() {
                 />
                 <br />
                 <button
-                  className="btn w-100 text-white"
+                  className="btn w-100 text-white mb-3"
                   style={{
                     fontSize: 12,
                     border: "none",
