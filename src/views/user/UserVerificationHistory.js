@@ -126,11 +126,11 @@ function UserVerificationHistory() {
                             ))}
                           </tbody>
                         ) : (
-                          <tbody className="d-center w-100">
-                            <tr>
-                              <td>No codes added yet</td>
-                            </tr>
-                          </tbody>
+                          <tr>
+                            <td colSpan="7" className="text-center">
+                              No code added yet
+                            </td>
+                          </tr>
                         )}
                       </Table>
                     </Card.Body>

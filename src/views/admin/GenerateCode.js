@@ -26,6 +26,8 @@ function GenerateCode() {
   const [points, setPoints] = useState("");
   const [loading, setLoading] = useState(false);
   const [codesList, setCodesList] = useState([]);
+  console.log("codesList", codesList);
+
   const [totalCodes, setTotalCodes] = useState("");
   const [generatedCode, setGeneratedCode] = useState("");
 
@@ -41,17 +43,35 @@ function GenerateCode() {
     return () => unsubscribe(); // Cleanup listener on component unmount
   }, []);
 
-  // Generate random codes
+  // Generate unique random codes
   const handleGenerate = () => {
     const numCodes = parseInt(totalCodes, 10);
-    if (isNaN(numCodes) || numCodes <= 0) {
+
+    // Validate input
+    if (isNaN(numCodes)) {
       toast.error("Please enter a valid number of codes to generate.");
       return;
     }
-    const newCodes = Array.from({ length: numCodes }, () =>
-      Math.random().toString(36).substring(2, 10).toUpperCase()
-    );
-    setGeneratedCode(newCodes.join(", ")); // Display generated codes
+    if (numCodes <= 0 || numCodes > 100) {
+      toast.error("Number of codes must be between 1 and 100.");
+      return;
+    }
+    if (!points || parseInt(points, 10) < 1) {
+      toast.error("Points must be at least 1.");
+      return;
+    }
+
+    const existingCodes = new Set(codesList.map((code) => code.code)); // Get existing codes from Firestore
+    const newCodes = new Set();
+
+    while (newCodes.size < numCodes) {
+      const code = Math.random().toString(36).substring(2, 10).toUpperCase();
+      if (!existingCodes.has(code)) {
+        newCodes.add(code); // Ensure uniqueness
+      }
+    }
+
+    setGeneratedCode(Array.from(newCodes).join(", ")); // Display generated codes
   };
 
   // Save generated codes to Firestore
@@ -65,10 +85,12 @@ function GenerateCode() {
       code,
       points: parseInt(points, 10),
       created_at: new Date(),
-      status: true, // Boolean status instead of string
+      status: true,
+      used: false, // Added 'used' field with initial value false
     }));
 
     try {
+      setLoading(true);
       for (const code of codesArray) {
         await addDoc(collection(db, "codes"), code);
       }
@@ -79,28 +101,36 @@ function GenerateCode() {
     } catch (error) {
       console.error("Error saving codes:", error);
       toast.error("Failed to save codes.");
+    } finally {
+      setLoading(false);
     }
   };
 
   // Delete a code from Firestore
   const handleDelete = async (id) => {
     try {
+      setLoading(true);
       await deleteDoc(doc(db, "codes", id));
       toast.success("Code deleted successfully!");
     } catch (error) {
       console.error("Error deleting code:", error);
       toast.error("Failed to delete code.");
+    } finally {
+      setLoading(false);
     }
   };
 
   // Toggle Active/Inactive status in Firestore
   const handleToggleStatus = async (id, currentStatus) => {
     try {
+      setLoading(true);
       await updateDoc(doc(db, "codes", id), { status: !currentStatus });
       toast.success("Status updated successfully!");
     } catch (error) {
       console.error("Error updating status:", error);
       toast.error("Failed to update status.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -141,20 +171,23 @@ function GenerateCode() {
                   <Col md="3">
                     <Form.Group>
                       <Form.Control
-                        placeholder="Total Codes..."
+                        placeholder="Total Codes (Max 100)..."
                         type="number"
                         value={totalCodes}
                         onChange={(e) => setTotalCodes(e.target.value)}
+                        min="1"
+                        max="100"
                       />
                     </Form.Group>
                   </Col>
                   <Col md="2">
                     <Form.Group>
                       <Form.Control
-                        placeholder="Points"
+                        placeholder="Points (Min 1)"
                         type="number"
                         value={points}
                         onChange={(e) => setPoints(e.target.value)}
+                        min="1"
                       />
                     </Form.Group>
                   </Col>
@@ -214,6 +247,7 @@ function GenerateCode() {
                       <th>Code</th>
                       <th>Points</th>
                       <th>Created At</th>
+                      <th>Used</th>
                       <th>Status</th>
                       <th>Actions</th>
                     </tr>
@@ -230,6 +264,7 @@ function GenerateCode() {
                               item.created_at.seconds * 1000
                             ).toLocaleString()}
                           </td>
+                          <td>{item.used == true ? "Yes" : "No"}</td>
                           <td>
                             <label className="switch">
                               <input
@@ -255,7 +290,7 @@ function GenerateCode() {
                       ))
                     ) : (
                       <tr>
-                        <td colSpan="6" className="text-center">
+                        <td colSpan="7" className="text-center">
                           No codes generated yet
                         </td>
                       </tr>

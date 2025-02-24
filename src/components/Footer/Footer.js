@@ -8,7 +8,10 @@ class Footer extends Component {
         <Container fluid>
           <nav>
             <p className="copyright text-center">
-              © {new Date().getFullYear()} made with love for a better web
+              © {new Date().getFullYear()} made by{" "}
+              <a target="_blank" href="https://shayandev.my.canva.site/">
+                me
+              </a>
             </p>
           </nav>
         </Container>
