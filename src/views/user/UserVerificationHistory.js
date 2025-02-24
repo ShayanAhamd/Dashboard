@@ -10,6 +10,7 @@ import {
   Modal,
   Form,
 } from "react-bootstrap";
+import { ToastContainer, toast } from "react-toastify";
 
 function UserVerificationHistory() {
   const [showModal, setShowModal] = useState(false);
@@ -24,22 +25,41 @@ function UserVerificationHistory() {
 
   const handleClose = () => setShowModal(false);
   const handleShow = () => setShowModal(true);
+
   const handleSave = () => {
+    // Fetch generated codes from localStorage
+    const generatedCodes =
+      JSON.parse(localStorage.getItem("generatedCodes")) || [];
+
+    // Check if the entered code exists in the generatedCodes array
+    const isValidCode = generatedCodes.some(
+      (generatedCode) => generatedCode.code === code
+    );
+
+    if (!isValidCode) {
+      toast.error("Invalid code. Please enter a valid code.");
+      return;
+    }
+
+    // If the code is valid, proceed to save it
     const newCode = {
       date: new Date().toISOString().split("T")[0],
       code,
-      status: "Pending",
+      status: "Active",
       point: 0,
     };
+
     const updatedCodes = [...codes, newCode];
     setCodes(updatedCodes);
     localStorage.setItem("verificationCodes", JSON.stringify(updatedCodes));
     setCode("");
     setShowModal(false);
+    toast.success("Code saved successfully!");
   };
 
   return (
     <>
+      <ToastContainer />
       <div className="container-fluid pt-3 is-cable-bg">
         <br />
         <div className="row px-4 py-3 d-center">
