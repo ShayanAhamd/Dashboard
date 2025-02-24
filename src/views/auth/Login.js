@@ -1,12 +1,17 @@
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import React, { useState } from "react";
 import { ToastContainer, toast } from "react-toastify";
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { auth } from "config/FirebaseConfig";
+import { getFirestore, doc, getDoc } from "firebase/firestore";
+import Loader from "components/common/Loader";
 
 function Login() {
   const navigate = useNavigate();
   const location = useLocation();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false); // Loader state
 
   const validateForm = () => {
     if (!email || !password) {
@@ -14,7 +19,7 @@ function Login() {
       return false;
     }
 
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const emailRegex = /^[^\s@]+@[^\s@]+$/;
     if (!emailRegex.test(email)) {
       toast.error("Please enter a valid email address.");
       return false;
@@ -23,17 +28,39 @@ function Login() {
     return true;
   };
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
     if (!validateForm()) return;
+    setLoading(true);
 
-    const users = JSON.parse(localStorage.getItem("users")) || [];
-    const foundUser = users.find(
-      (user) => user.Email === email && user.Password === password
-    );
+    try {
+      const userCredential = await signInWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
+      const user = userCredential.user;
 
-    if (foundUser) {
-      localStorage.setItem("loggedInUser", JSON.stringify(foundUser));
+      // Fetch user details from Firestore
+      const db = getFirestore();
+      const userDocRef = doc(db, "users", user.uid);
+      const userDoc = await getDoc(userDocRef);
+
+      if (!userDoc.exists()) {
+        toast.error("User not found. Please contact support.");
+        setLoading(false);
+        return;
+      }
+
+      const userData = userDoc.data();
+
+      if (userData.is_admin) {
+        toast.error("Admins cannot log in from this portal.");
+        return;
+      }
+
+      localStorage.setItem("loggedInUser", JSON.stringify(userData));
+
       toast.success("Login Successful!");
 
       setTimeout(() => {
@@ -43,13 +70,16 @@ function Login() {
           navigate("/user-history");
         }
       }, 2000);
-    } else {
+    } catch (error) {
       toast.error("Invalid email or password.");
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <>
+      <Loader loading={loading} />
       <ToastContainer />
       <div className="container-fluid pt-5 is-cable-bg">
         <br />

@@ -1,57 +1,37 @@
-// import { auth } from "../Config/Config";
-import { Link } from "react-router-dom";
+import { auth } from "config/FirebaseConfig";
 import React, { useState, useEffect } from "react";
-// import { ToastContainer, toast } from "react-toastify";
+import { Link, useNavigate } from "react-router-dom";
+import { signInWithEmailAndPassword, onAuthStateChanged } from "firebase/auth";
 
 function AdminLogin() {
   const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [user, setUser] = useState(null);
-  const [password, setPassword] = useState("");
+  const navigate = useNavigate();
 
-  // useEffect(() => {
-  //   const unsubscribe = auth.onAuthStateChanged((currentUser) => {
-  //     if (currentUser) {
-  //       setUser(currentUser);
-  //     } else {
-  //       setUser(null);
-  //     }
-  //   });
-  //   return () => unsubscribe();
-  // }, []);
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser);
+    });
+    return () => unsubscribe();
+  }, []);
 
-  // const login = (e) => {
-  //   e.preventDefault();
-  //   auth
-  //     .signInWithEmailAndPassword(email, password)
-  //     .then(() => {
-  //       setEmail("");
-  //       setPassword("");
-  //       setError("");
-  //       toast.success("Login Successfully");
-  //       setTimeout(() => props.history.push("/"), 3000);
-  //     })
-  //     .catch((err) => {
-  //       try {
-  //         const errorMessage =
-  //           JSON.parse(err.message)?.error?.message || "An error occurred";
-  //         setError(
-  //           errorMessage.charAt(0).toUpperCase() + errorMessage.slice(1)
-  //         );
-  //         toast.error(
-  //           errorMessage.charAt(0).toUpperCase() + errorMessage.slice(1)
-  //         );
-  //       } catch (error) {
-  //         console.log("Error parsing the error message:", error);
-  //         setError("An unexpected error occurred");
-  //       }
-  //     });
-  // };
+  const login = async (e) => {
+    e.preventDefault();
+    try {
+      await signInWithEmailAndPassword(auth, email, password);
+      setEmail("");
+      setPassword("");
+      setError("");
+      navigate("/admin/dashboard");
+    } catch (err) {
+      setError(err.message);
+    }
+  };
 
   return (
     <>
-      {/* {user?.isAdmin && <Navbar user={user} />} */}
-      {/* <ToastContainer /> */}
       <div className="container-fluid pt-5 is-cable-bg">
         <div className="row px-4 py-3 d-center mt-3">
           <div
@@ -73,7 +53,7 @@ function AdminLogin() {
               Admin Login
             </h4>
             <br />
-            <form autoComplete="off" className="form-group">
+            <form onSubmit={login} autoComplete="off" className="form-group">
               <input
                 type="email"
                 value={email}
@@ -90,10 +70,10 @@ function AdminLogin() {
                 onChange={(e) => setPassword(e.target.value)}
               />
               <br />
-              <Link
-                to="/admin/dashboard"
+              {error && <p style={{ color: "red" }}>{error}</p>}
+              <button
                 type="submit"
-                className="btn w-100 text-white"
+                className="btn w-100 text-white mb-3"
                 style={{
                   fontSize: 12,
                   border: "none",
@@ -101,7 +81,7 @@ function AdminLogin() {
                 }}
               >
                 LOGIN
-              </Link>
+              </button>
             </form>
           </div>
         </div>

@@ -27,11 +27,9 @@ function UserVerificationHistory() {
   const handleShow = () => setShowModal(true);
 
   const handleSave = () => {
-    // Fetch generated codes from localStorage
     const generatedCodes =
       JSON.parse(localStorage.getItem("generatedCodes")) || [];
 
-    // Check if the entered code exists in the generatedCodes array
     const isValidCode = generatedCodes.some(
       (generatedCode) => generatedCode.code === code
     );
@@ -41,7 +39,6 @@ function UserVerificationHistory() {
       return;
     }
 
-    // If the code is valid, proceed to save it
     const newCode = {
       date: new Date().toISOString().split("T")[0],
       code,
@@ -129,7 +126,11 @@ function UserVerificationHistory() {
                             ))}
                           </tbody>
                         ) : (
-                          <div className="d-center">No codes added yet</div>
+                          <tbody className="d-center w-100">
+                            <tr>
+                              <td>No codes added yet</td>
+                            </tr>
+                          </tbody>
                         )}
                       </Table>
                     </Card.Body>
@@ -140,8 +141,6 @@ function UserVerificationHistory() {
           </div>
         </div>
       </div>
-
-      {/* Add Code Modal */}
       <Modal show={showModal} onHide={handleClose}>
         <Modal.Header closeButton>
           <Modal.Title>Add Code</Modal.Title>

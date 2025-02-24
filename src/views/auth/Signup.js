@@ -1,6 +1,9 @@
-import { Link, useNavigate } from "react-router-dom";
 import React, { useState } from "react";
+import { auth, db } from "config/FirebaseConfig";
+import { doc, setDoc } from "firebase/firestore";
+import { Link, useNavigate } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
+import { createUserWithEmailAndPassword } from "firebase/auth";
 
 function Signup() {
   const [name, setName] = useState("");
@@ -87,46 +90,35 @@ function Signup() {
     return true;
   };
 
-  const signup = (e) => {
+  const signup = async (e) => {
     e.preventDefault();
     if (!validateForm()) return;
 
-    const userData = {
-      Name: name,
-      Email: email,
-      Password: password,
-      CNIC: cnic,
-      Phone: phone,
-      DealerName: dealerName,
-      City: city,
-      Address: address,
-      is_admin: false,
-      created_at: new Date().toISOString(),
-    };
+    try {
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
+      const user = userCredential.user;
+      const response = await setDoc(doc(db, "users", user.uid), {
+        name,
+        email,
+        cnic,
+        phone,
+        dealerName,
+        city,
+        address,
+        is_admin: false,
+        created_at: new Date().toISOString(),
+      });
 
-    const existingUsers = JSON.parse(localStorage.getItem("users")) || [];
-    const emailExists = existingUsers.some((user) => user.Email === email);
-
-    if (emailExists) {
-      toast.error("Email already exists. Please use a different email.");
-      return;
+      toast.success("Signup Successful!");
+      setTimeout(() => navigate("/login"), 3000);
+    } catch (error) {
+      console.error("Signup Error:", error);
+      toast.error(error.message);
     }
-
-    existingUsers.push(userData);
-    localStorage.setItem("users", JSON.stringify(existingUsers));
-
-    setName("");
-    setEmail("");
-    setPassword("");
-    setConfirmPassword("");
-    setCnic("");
-    setPhone("");
-    setDealerName("");
-    setCity("");
-    setAddress("");
-
-    toast.success("Signup Successful");
-    setTimeout(() => navigate("/login"), 3000);
   };
 
   return (

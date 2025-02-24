@@ -1,10 +1,13 @@
 import React from "react";
-import { useLocation, Link } from "react-router-dom";
-import { Navbar, Container, Nav, Button } from "react-bootstrap";
 import routes from "routes.js";
+import { signOut } from "firebase/auth";
+import { auth } from "config/FirebaseConfig";
+import { useLocation, Link, useNavigate } from "react-router-dom";
+import { Navbar, Container, Nav, Button } from "react-bootstrap";
 
 function Header() {
   const location = useLocation();
+  const navigate = useNavigate();
 
   const mobileSidebarToggle = (e) => {
     e.preventDefault();
@@ -30,6 +33,15 @@ function Header() {
       }
     }
     return "Brand";
+  };
+
+  const handleLogout = async () => {
+    try {
+      await signOut(auth);
+      navigate("/admin-login");
+    } catch (error) {
+      console.error("Logout Error:", error);
+    }
   };
 
   return (
@@ -58,9 +70,9 @@ function Header() {
           </Nav>
           <Nav className="ms-auto">
             <Nav.Item>
-              <Nav.Link as={Link} to="/admin-login">
-                <span className="no-icon">Log out</span>
-              </Nav.Link>
+              <Button variant="danger" onClick={handleLogout}>
+                Log out
+              </Button>
             </Nav.Item>
           </Nav>
         </Navbar.Collapse>

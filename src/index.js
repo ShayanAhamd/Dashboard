@@ -19,6 +19,7 @@ import AdminLayout from "layouts/Admin.js";
 import EditUser from "views/user/EditUser";
 import AdminLogin from "views/auth/AdminLogin";
 import UserVerificationHistory from "views/user/UserVerificationHistory";
+import PrivateRoute from "PrivateRoute";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 
@@ -28,9 +29,30 @@ root.render(
       <Route path="/login" element={<Login />} />
       <Route path="/signup" element={<Signup />} />
       <Route path="/admin-login" element={<AdminLogin />} />
-      <Route path="/edit-user" element={<EditUser />} />
-      <Route path="/user-history" element={<UserVerificationHistory />} />
-      <Route path="/admin/*" element={<AdminLayout />} />
+      <Route
+        path="/edit-user"
+        element={
+          <PrivateRoute>
+            <EditUser />
+          </PrivateRoute>
+        }
+      />
+      <Route
+        path="/user-history"
+        element={
+          <PrivateRoute>
+            <UserVerificationHistory />
+          </PrivateRoute>
+        }
+      />
+      <Route
+        path="/admin/*"
+        element={
+          <PrivateRoute>
+            <AdminLayout />
+          </PrivateRoute>
+        }
+      />
       {/* Redirect unknown routes to login */}
       <Route path="*" element={<Navigate to="/login" />} />
     </Routes>
