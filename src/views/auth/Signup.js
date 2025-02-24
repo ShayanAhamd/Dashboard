@@ -10,6 +10,8 @@ function Signup() {
   const [cnic, setCnic] = useState("");
   const [phone, setPhone] = useState("");
   const [dealerName, setDealerName] = useState("");
+  const [city, setCity] = useState("");
+  const [address, setAddress] = useState("");
   const navigate = useNavigate();
 
   const formatCNIC = (value) => {
@@ -72,6 +74,16 @@ function Signup() {
       return false;
     }
 
+    if (city.trim() === "") {
+      toast.error("City is required.");
+      return false;
+    }
+
+    if (address.trim() === "") {
+      toast.error("Address is required.");
+      return false;
+    }
+
     return true;
   };
 
@@ -86,6 +98,8 @@ function Signup() {
       CNIC: cnic,
       Phone: phone,
       DealerName: dealerName,
+      City: city,
+      Address: address,
       is_admin: false,
       created_at: new Date().toISOString(),
     };
@@ -108,6 +122,8 @@ function Signup() {
     setCnic("");
     setPhone("");
     setDealerName("");
+    setCity("");
+    setAddress("");
 
     toast.success("Signup Successful");
     setTimeout(() => navigate("/login"), 3000);
@@ -199,7 +215,7 @@ function Signup() {
                     placeholder="City"
                     className="form-control"
                     required
-                    onChange={(e) => setCnic(e.target.value)}
+                    onChange={(e) => setCity(e.target.value)}
                   />
                 </div>
               </div>
@@ -211,7 +227,7 @@ function Signup() {
                     placeholder="Address"
                     className="form-control"
                     required
-                    onChange={(e) => setCnic(e.target.value)}
+                    onChange={(e) => setAddress(e.target.value)}
                   />
                 </div>
                 <div className="col-md-6 col-12">
@@ -237,7 +253,6 @@ function Signup() {
                 placeholder="Dealer Name"
                 onChange={(e) => setDealerName(e.target.value)}
               />
-
               <br />
               <button
                 type="submit"

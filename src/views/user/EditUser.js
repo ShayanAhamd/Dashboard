@@ -1,8 +1,6 @@
-// import { Navbar } from "./Navbar";
 import { Link, useNavigate } from "react-router-dom";
-// import { auth, db } from "../Config/Config";
 import React, { useEffect, useState } from "react";
-// import { ToastContainer, toast } from "react-toastify";
+import { ToastContainer, toast } from "react-toastify";
 
 function EditUser() {
   const [name, setName] = useState("");
@@ -11,55 +9,67 @@ function EditUser() {
   const [cnic, setCnic] = useState("");
   const [phone, setPhone] = useState("");
   const [dealerName, setDealerName] = useState("");
+  const [city, setCity] = useState("");
+  const [address, setAddress] = useState("");
   const [error, setError] = useState("");
-  const [user, setUser] = useState(null);
   const navigate = useNavigate();
 
-  // useEffect(() => {
-  //   const unsubscribe = auth.onAuthStateChanged((currentUser) => {
-  //     setUser(currentUser ? currentUser : null);
-  //   });
-  //   return () => unsubscribe();
-  // }, []);
+  // Fetch user data from local storage when the component mounts
+  useEffect(() => {
+    const loggedInUser = JSON.parse(localStorage.getItem("loggedInUser"));
+    if (loggedInUser) {
+      setName(loggedInUser.Name);
+      setEmail(loggedInUser.Email);
+      setPassword(loggedInUser.Password);
+      setCnic(loggedInUser.CNIC);
+      setPhone(loggedInUser.Phone);
+      setDealerName(loggedInUser.DealerName);
+      setCity(loggedInUser.City || "");
+      setAddress(loggedInUser.Address || "");
+    }
+  }, []);
 
-  // Signup function
-  // const signup = (e) => {
-  //   e.preventDefault();
-  //   auth
-  //     .createUserWithEmailAndPassword(email, password)
-  //     .then((cred) => {
-  //       db.collection("SignedUpUsersData")
-  //         .doc(cred.user.uid)
-  //         .set({
-  //           Name: name,
-  //           Email: email,
-  //           Password: password,
-  //           CNIC: cnic,
-  //           Phone: phone,
-  //           DealerName: dealerName,
-  //           is_admin: false,
-  //           created_at: new Date(),
-  //         })
-  //         .then(() => {
-  //           setName("");
-  //           setEmail("");
-  //           setPassword("");
-  //           setCnic("");
-  //           setPhone("");
-  //           setDealerName("");
-  //           setError("");
-  //           toast.success("Signup Successful");
-  //           setTimeout(() => navigate.push("/login"), 3000);
-  //         })
-  //         .catch((err) => toast.error(err.message));
-  //     })
-  //     .catch((err) => toast.error(err.message));
-  // };
+  // Handle form submission
+  const handleUpdate = (e) => {
+    e.preventDefault();
+
+    // Validate form fields
+    if (
+      !name ||
+      !email ||
+      !password ||
+      !cnic ||
+      !phone ||
+      !dealerName ||
+      !city ||
+      !address
+    ) {
+      toast.error("All fields are required.");
+      return;
+    }
+
+    const updatedUserData = {
+      Name: name,
+      Email: email,
+      Password: password,
+      CNIC: cnic,
+      Phone: phone,
+      DealerName: dealerName,
+      City: city,
+      Address: address,
+      is_admin: false, // Preserve existing fields
+      created_at: new Date().toISOString(), // Preserve existing fields
+    };
+
+    // Update user data in local storage
+    localStorage.setItem("loggedInUser", JSON.stringify(updatedUserData));
+    toast.success("Profile updated successfully!");
+    setTimeout(() => navigate("/user-history"), 3000); // Redirect to profile page after update
+  };
 
   return (
     <>
-      {/* {user?.isAdmin && <Navbar user={user} />}
-      <ToastContainer /> */}
+      <ToastContainer />
       <div className="container-fluid is-cable-bg">
         <div className="row px-4 py-3 d-center">
           <div
@@ -80,7 +90,11 @@ function EditUser() {
             >
               Edit Your Profile
             </h4>
-            <form autoComplete="off" className="form-group">
+            <form
+              autoComplete="off"
+              className="form-group"
+              onSubmit={handleUpdate}
+            >
               <div className="row">
                 <div className="col-md-6 col-12">
                   <label className="mb-0 mt-2">Full Name</label>
@@ -99,11 +113,9 @@ function EditUser() {
                     required
                     disabled
                     type="email"
-                    value={cnic}
-                    maxLength={13}
+                    value={email}
                     className="form-control"
                     placeholder="Email"
-                    onChange={(e) => setCnic(e.target.value)}
                   />
                 </div>
               </div>
@@ -115,10 +127,8 @@ function EditUser() {
                     disabled
                     type="text"
                     value={cnic}
-                    maxLength={13}
                     className="form-control"
-                    placeholder="CNIC"
-                    onChange={(e) => setCnic(e.target.value)}
+                    placeholder="12345-6789012-3"
                   />
                 </div>
                 <div className="col-md-6 col-12">
@@ -128,7 +138,8 @@ function EditUser() {
                     placeholder="City"
                     className="form-control"
                     required
-                    onChange={(e) => setCnic(e.target.value)}
+                    value={city}
+                    onChange={(e) => setCity(e.target.value)}
                   />
                 </div>
               </div>
@@ -138,10 +149,10 @@ function EditUser() {
                   <input
                     required
                     type="text"
-                    value={dealerName}
-                    placeholder="Dealer Name"
+                    value={address}
+                    placeholder="Address"
                     className="form-control"
-                    onChange={(e) => setDealerName(e.target.value)}
+                    onChange={(e) => setAddress(e.target.value)}
                   />
                 </div>
                 <div className="col-md-6 col-12">
@@ -156,6 +167,16 @@ function EditUser() {
                   />
                 </div>
               </div>
+              <label className="mb-0 mt-2">Dealer Name</label>
+              <input
+                type="text"
+                value={dealerName}
+                className="form-control"
+                required
+                placeholder="Dealer Name"
+                onChange={(e) => setDealerName(e.target.value)}
+              />
+              <br />
               <div className="d-end">
                 <button
                   type="submit"
