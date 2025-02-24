@@ -227,60 +227,7 @@ function Dashboard() {
                 <Card.Title as="h4">Recent Activity</Card.Title>
               </Card.Header>
               <Card.Body>
-                <div className="table-full-width">
-                  <Table>
-                    <tbody>
-                      <tr>
-                        {/* <td>
-                          <Form.Check className="mb-1 pl-0">
-                            <Form.Check.Label>
-                              <Form.Check.Input
-                                defaultValue=""
-                                type="checkbox"
-                              ></Form.Check.Input>
-                              <span className="form-check-sign"></span>
-                            </Form.Check.Label>
-                          </Form.Check>
-                        </td>
-                        <td>
-                          Use the points to get the rewards that are created by
-                          IS Cables & Fans admin
-                        </td>
-                        <td className="td-actions text-right">
-                          <OverlayTrigger
-                            overlay={
-                              <Tooltip id="tooltip-488980961">
-                                Edit Task..
-                              </Tooltip>
-                            }
-                          >
-                            <Button
-                              className="btn-simple btn-link p-1"
-                              type="button"
-                              variant="info"
-                            >
-                              <i className="fas fa-edit"></i>
-                            </Button>
-                          </OverlayTrigger>
-                          <OverlayTrigger
-                            overlay={
-                              <Tooltip id="tooltip-506045838">Remove..</Tooltip>
-                            }
-                          >
-                            <Button
-                              className="btn-simple btn-link p-1"
-                              type="button"
-                              variant="danger"
-                            >
-                              <i className="fas fa-times"></i>
-                            </Button>
-                          </OverlayTrigger>
-                        </td> */}
-                      </tr>
-                      <div className="d-center">no data found</div>
-                    </tbody>
-                  </Table>
-                </div>
+                <div className="table-full-width"></div>
               </Card.Body>
             </Card>
           </Col>

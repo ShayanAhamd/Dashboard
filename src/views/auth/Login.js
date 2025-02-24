@@ -11,7 +11,7 @@ function Login() {
   const location = useLocation();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [loading, setLoading] = useState(false); // Loader state
+  const [loading, setLoading] = useState(false);
 
   const validateForm = () => {
     if (!email || !password) {

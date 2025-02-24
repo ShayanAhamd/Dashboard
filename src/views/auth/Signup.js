@@ -4,18 +4,20 @@ import { doc, setDoc } from "firebase/firestore";
 import { Link, useNavigate } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import { createUserWithEmailAndPassword } from "firebase/auth";
+import Loader from "components/common/Loader";
 
 function Signup() {
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [cnic, setCnic] = useState("");
-  const [phone, setPhone] = useState("");
-  const [dealerName, setDealerName] = useState("");
-  const [city, setCity] = useState("");
-  const [address, setAddress] = useState("");
   const navigate = useNavigate();
+  const [name, setName] = useState("");
+  const [cnic, setCnic] = useState("");
+  const [city, setCity] = useState("");
+  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
+  const [address, setAddress] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [dealerName, setDealerName] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
 
   const formatCNIC = (value) => {
     const numericValue = value.replace(/\D/g, "").slice(0, 13);
@@ -93,6 +95,7 @@ function Signup() {
   const signup = async (e) => {
     e.preventDefault();
     if (!validateForm()) return;
+    setLoading(true);
 
     try {
       const userCredential = await createUserWithEmailAndPassword(
@@ -114,15 +117,19 @@ function Signup() {
       });
 
       toast.success("Signup Successful!");
+      setLoading(false);
       setTimeout(() => navigate("/login"), 3000);
     } catch (error) {
       console.error("Signup Error:", error);
       toast.error(error.message);
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <>
+      <Loader loading={loading} />
       <ToastContainer />
       <div className="container-fluid is-cable-bg">
         <div className="row px-4 py-3 d-center">

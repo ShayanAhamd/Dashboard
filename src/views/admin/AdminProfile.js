@@ -1,40 +1,119 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Button, Card, Form, Container, Row, Col } from "react-bootstrap";
-import { Eye, EyeSlash } from "react-bootstrap-icons";
+import { auth, db } from "config/FirebaseConfig";
+import { doc, getDoc, updateDoc } from "firebase/firestore";
+import { onAuthStateChanged } from "firebase/auth";
+import { toast, ToastContainer } from "react-toastify";
+import Loader from "components/common/Loader";
 
 function AdminProfile() {
-  const [showPassword, setShowPassword] = useState(false);
+  const [adminData, setAdminData] = useState({
+    name: "",
+    email: "",
+    phone: "",
+  });
+  const [initialData, setInitialData] = useState(null); // Store original data
+  const [loading, setLoading] = useState(false);
+  const [userId, setUserId] = useState(null);
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        setUserId(user.uid);
+        fetchAdminData(user.uid);
+      }
+    });
+
+    return () => unsubscribe();
+  }, []);
+
+  const fetchAdminData = async (uid) => {
+    setLoading(true);
+    try {
+      const userDoc = await getDoc(doc(db, "users", uid));
+      if (userDoc.exists()) {
+        const userData = userDoc.data();
+        setAdminData({
+          name: userData.name || "",
+          email: userData.email || "",
+          phone: userData.phone || "",
+        });
+        setInitialData({
+          name: userData.name || "",
+          email: userData.email || "",
+          phone: userData.phone || "",
+        });
+      } else {
+        toast.error("Admin data not found!");
+      }
+    } catch (error) {
+      toast.error("Failed to fetch admin data.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleChange = (e) => {
+    setAdminData({ ...adminData, [e.target.name]: e.target.value });
+  };
+
+  const isDataChanged =
+    JSON.stringify(adminData) !== JSON.stringify(initialData);
+
+  const handleUpdateProfile = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+
+    try {
+      await updateDoc(doc(db, "users", userId), {
+        name: adminData.name,
+        phone: adminData.phone,
+      });
+      setInitialData(adminData); // Update initial data after saving
+      toast.success("Profile updated successfully!");
+    } catch (error) {
+      toast.error("Failed to update profile.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <>
+      <Loader loading={loading} />
+      <ToastContainer />
       <Container fluid>
         <Row>
           <Col md="12">
             <Card>
               <Card.Header>
-                <Card.Title as="h4">Edit Profile</Card.Title>
+                <Card.Title as="h4">Admin Profile</Card.Title>
               </Card.Header>
               <Card.Body>
-                <Form>
+                <Form onSubmit={handleUpdateProfile}>
                   <Row>
-                    <Col className="pl-1" md="6">
+                    <Col md="6">
                       <Form.Group>
-                        <label htmlFor="first name">First Name</label>
+                        <label>Name</label>
                         <Form.Control
-                          defaultValue="first"
-                          placeholder="First Name"
+                          name="name"
+                          value={adminData.name}
+                          onChange={handleChange}
+                          placeholder="Name"
                           type="text"
-                        ></Form.Control>
+                        />
                       </Form.Group>
                     </Col>
-                    <Col className="pl-1" md="6">
+                    <Col md="6">
                       <Form.Group>
-                        <label htmlFor="email">Last Name</label>
+                        <label>Phone Number</label>
                         <Form.Control
-                          defaultValue="last"
-                          placeholder="Last Name"
+                          name="phone"
+                          value={adminData.phone}
+                          onChange={handleChange}
+                          placeholder="Phone Number"
                           type="text"
-                        ></Form.Control>
+                        />
                       </Form.Group>
                     </Col>
                   </Row>
@@ -43,33 +122,11 @@ function AdminProfile() {
                       <Form.Group>
                         <label>Email</label>
                         <Form.Control
-                          defaultValue="admin@gmail.com"
+                          value={adminData.email}
                           placeholder="Email Address"
                           type="email"
-                        ></Form.Control>
-                      </Form.Group>
-                    </Col>
-                    <Col md="6">
-                      <Form.Group>
-                        <label>Password</label>
-                        <div className="position-relative">
-                          <Form.Control
-                            defaultValue="test123"
-                            placeholder="Password"
-                            type={showPassword ? "text" : "password"}
-                          ></Form.Control>
-                          <Button
-                            variant="light"
-                            className="position-absolute end-0 top-50 translate-middle-y"
-                            style={{
-                              border: "none",
-                              background: "transparent",
-                            }}
-                            onClick={() => setShowPassword(!showPassword)}
-                          >
-                            {showPassword ? <EyeSlash /> : <Eye />}
-                          </Button>
-                        </div>
+                          disabled
+                        />
                       </Form.Group>
                     </Col>
                   </Row>
@@ -78,10 +135,10 @@ function AdminProfile() {
                       className="btn-fill pull-right btn-sm"
                       type="submit"
                       variant="info"
+                      disabled={!isDataChanged || loading} // Disable button if no changes
                     >
-                      Update Profile
+                      {loading ? "Updating..." : "Update Profile"}
                     </Button>
-                    <div className="clearfix"></div>
                   </div>
                 </Form>
               </Card.Body>

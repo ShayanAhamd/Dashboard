@@ -8,87 +8,106 @@ import {
   Col,
   Table,
   Button,
-  FormCheck,
 } from "react-bootstrap";
 import { exportToCSV } from "utils/genralHelper";
+import { db } from "config/FirebaseConfig";
+import {
+  collection,
+  addDoc,
+  deleteDoc,
+  doc,
+  updateDoc,
+  onSnapshot,
+} from "firebase/firestore";
+import { toast, ToastContainer } from "react-toastify";
+import Loader from "components/common/Loader";
 
 function GenerateCode() {
-  const [generatedCode, setGeneratedCode] = useState("");
-  const [totalCodes, setTotalCodes] = useState("");
-  const [codesList, setCodesList] = useState([]);
   const [points, setPoints] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [codesList, setCodesList] = useState([]);
+  const [totalCodes, setTotalCodes] = useState("");
+  const [generatedCode, setGeneratedCode] = useState("");
 
-  // Load codes from local storage when the component mounts
   useEffect(() => {
-    const storedCodes =
-      JSON.parse(localStorage.getItem("generatedCodes")) || [];
-    setCodesList(storedCodes);
+    const unsubscribe = onSnapshot(collection(db, "codes"), (snapshot) => {
+      const updatedCodes = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+      setCodesList(updatedCodes);
+    });
+
+    return () => unsubscribe(); // Cleanup listener on component unmount
   }, []);
 
-  // Function to generate multiple random alphanumeric codes
+  // Generate random codes
   const handleGenerate = () => {
     const numCodes = parseInt(totalCodes, 10);
-
     if (isNaN(numCodes) || numCodes <= 0) {
-      alert("Please enter a valid number of codes to generate.");
+      toast.error("Please enter a valid number of codes to generate.");
       return;
     }
-
     const newCodes = Array.from({ length: numCodes }, () =>
       Math.random().toString(36).substring(2, 10).toUpperCase()
     );
-
-    setGeneratedCode(newCodes.join(", ")); // Show generated codes as a comma-separated string
+    setGeneratedCode(newCodes.join(", ")); // Display generated codes
   };
 
-  // Function to save generated codes to local storage
-  const handleSave = () => {
+  // Save generated codes to Firestore
+  const handleSave = async () => {
     if (!generatedCode || !points) {
-      alert("Please enter points before saving.");
+      toast.error("Please enter points before saving.");
       return;
     }
 
     const codesArray = generatedCode.split(", ").map((code) => ({
       code,
-      points, // Store points with each code
-      createdAt: new Date().toLocaleString(),
-      status: "Active", // Default to Active
+      points: parseInt(points, 10),
+      created_at: new Date(),
+      status: true, // Boolean status instead of string
     }));
 
-    const updatedCodes = [...codesArray, ...codesList];
-    setCodesList(updatedCodes);
-    localStorage.setItem("generatedCodes", JSON.stringify(updatedCodes));
-
-    setGeneratedCode("");
-    setTotalCodes("");
-    setPoints(""); // Clear points input after saving
+    try {
+      for (const code of codesArray) {
+        await addDoc(collection(db, "codes"), code);
+      }
+      setGeneratedCode("");
+      setTotalCodes("");
+      setPoints("");
+      toast.success("Codes saved successfully!");
+    } catch (error) {
+      console.error("Error saving codes:", error);
+      toast.error("Failed to save codes.");
+    }
   };
 
-  // Function to delete a code
-  const handleDelete = (index) => {
-    const updatedCodes = codesList.filter((_, i) => i !== index);
-    setCodesList(updatedCodes);
-    localStorage.setItem("generatedCodes", JSON.stringify(updatedCodes));
+  // Delete a code from Firestore
+  const handleDelete = async (id) => {
+    try {
+      await deleteDoc(doc(db, "codes", id));
+      toast.success("Code deleted successfully!");
+    } catch (error) {
+      console.error("Error deleting code:", error);
+      toast.error("Failed to delete code.");
+    }
   };
 
-  // Function to toggle the status between Active/Inactive
-  const handleToggleStatus = (index) => {
-    const updatedCodes = codesList.map((item, i) =>
-      i === index
-        ? { ...item, status: item.status === "Active" ? "Inactive" : "Active" }
-        : item
-    );
-
-    setCodesList(updatedCodes);
-    localStorage.setItem("generatedCodes", JSON.stringify(updatedCodes));
-  };
-
-  const deleteCodes = () => {
-    setGeneratedCode(""); // Clear the generated codes input
+  // Toggle Active/Inactive status in Firestore
+  const handleToggleStatus = async (id, currentStatus) => {
+    try {
+      await updateDoc(doc(db, "codes", id), { status: !currentStatus });
+      toast.success("Status updated successfully!");
+    } catch (error) {
+      console.error("Error updating status:", error);
+      toast.error("Failed to update status.");
+    }
   };
 
   return (
     <>
+      <Loader loading={loading} />
+      <ToastContainer />
       <Container fluid>
         <Row>
           <Col md="12">
@@ -99,8 +118,7 @@ function GenerateCode() {
                   <Card.Title className="mr-4" as="h6">
                     <Button
                       variant="danger"
-                      onClick={deleteCodes}
-                      style={{ fontSize: 10 }}
+                      onClick={() => setGeneratedCode("")}
                       className="btn-fill pull-right w-100 py-1"
                     >
                       Delete Codes
@@ -110,7 +128,7 @@ function GenerateCode() {
               </Card.Header>
               <Card.Body className="table-full-width table-responsive px-5">
                 <Row>
-                  <Col className="px-1 pl-5" md="5">
+                  <Col md="5">
                     <Form.Group>
                       <Form.Control
                         readOnly
@@ -120,7 +138,7 @@ function GenerateCode() {
                       />
                     </Form.Group>
                   </Col>
-                  <Col className="px-1" md="3">
+                  <Col md="3">
                     <Form.Group>
                       <Form.Control
                         placeholder="Total Codes..."
@@ -130,17 +148,17 @@ function GenerateCode() {
                       />
                     </Form.Group>
                   </Col>
-                  <Col className="px-1" md="2">
+                  <Col md="2">
                     <Form.Group>
                       <Form.Control
                         placeholder="Points"
                         type="number"
                         value={points}
-                        onChange={(e) => setPoints(e.target.value)} // Update points state
+                        onChange={(e) => setPoints(e.target.value)}
                       />
                     </Form.Group>
                   </Col>
-                  <Col className="px-1 pl-3 pr-5" md="2">
+                  <Col md="2">
                     <Button
                       className="btn-fill pull-right w-100 py-1"
                       variant="info"
@@ -149,7 +167,7 @@ function GenerateCode() {
                       Generate
                     </Button>
                   </Col>
-                  <Col className="pt-3 px-0" md="12">
+                  <Col md="12" className="pt-3">
                     <Button
                       className="btn-fill pull-right w-100"
                       variant="info"
@@ -169,7 +187,7 @@ function GenerateCode() {
           <Col md="12">
             <Card className="strpied-tabled-with-hover">
               <Card.Header className="d-space-between">
-                <Card.Title className="text-left">
+                <Card.Title>
                   <h4 className="mt-1 d-start">
                     <i className="nc-icon nc-bullet-list-67 text-primary pr-2"></i>
                     <span>Generated Codes</span>
@@ -182,7 +200,6 @@ function GenerateCode() {
                       onClick={() =>
                         exportToCSV(codesList, "generated_codes.csv")
                       }
-                      disabled={codesList.length === 0}
                     >
                       Download CSV
                     </Button>
@@ -204,17 +221,23 @@ function GenerateCode() {
                   <tbody>
                     {codesList.length > 0 ? (
                       codesList.map((item, index) => (
-                        <tr key={index}>
+                        <tr key={item.id}>
                           <td>{index + 1}</td>
                           <td>{item.code}</td>
                           <td>{item.points}</td>
-                          <td>{item.createdAt}</td>
+                          <td>
+                            {new Date(
+                              item.created_at.seconds * 1000
+                            ).toLocaleString()}
+                          </td>
                           <td>
                             <label className="switch">
                               <input
                                 type="checkbox"
-                                checked={item.status === "Active"}
-                                onChange={() => handleToggleStatus(index)}
+                                checked={item.status}
+                                onChange={() =>
+                                  handleToggleStatus(item.id, item.status)
+                                }
                               />
                               <span className="slider"></span>
                             </label>
@@ -223,7 +246,7 @@ function GenerateCode() {
                             <Button
                               variant="danger"
                               size="sm"
-                              onClick={() => handleDelete(index)}
+                              onClick={() => handleDelete(item.id)}
                             >
                               Delete
                             </Button>

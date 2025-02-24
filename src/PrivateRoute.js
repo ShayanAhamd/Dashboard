@@ -17,7 +17,13 @@ const PrivateRoute = ({ children }) => {
   }, []);
 
   if (loading) {
-    return <p>Loading...</p>;
+    return (
+      <div className="d-center vh-100">
+        <div className="spinner-border m-5" role="status">
+          <span className="sr-only">Loading...</span>
+        </div>
+      </div>
+    );
   }
 
   return user ? children : <Navigate to="/admin-login" />;

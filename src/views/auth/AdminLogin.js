@@ -1,37 +1,54 @@
-import { auth } from "config/FirebaseConfig";
+import { auth, db } from "config/FirebaseConfig";
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { signInWithEmailAndPassword, onAuthStateChanged } from "firebase/auth";
+import { doc, getDoc } from "firebase/firestore";
+import Loader from "components/common/Loader";
+import { toast, ToastContainer } from "react-toastify";
 
 function AdminLogin() {
+  const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
-  const [user, setUser] = useState(null);
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      setUser(currentUser);
-    });
-    return () => unsubscribe();
-  }, []);
+  const [loading, setLoading] = useState(false);
 
   const login = async (e) => {
     e.preventDefault();
+    setLoading(true);
+
     try {
-      await signInWithEmailAndPassword(auth, email, password);
-      setEmail("");
-      setPassword("");
-      setError("");
-      navigate("/admin/dashboard");
+      const userCredential = await signInWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
+      const user = userCredential.user;
+      const userDoc = await getDoc(doc(db, "users", user.uid));
+
+      if (userDoc.exists()) {
+        const userData = userDoc.data();
+
+        if (userData.is_admin) {
+          toast.success("Login successful!");
+          navigate("/admin/dashboard");
+        } else {
+          toast.error("Access denied! You are not an admin.");
+          auth.signOut();
+        }
+      } else {
+        toast.error("User data not found.");
+      }
     } catch (err) {
-      setError(err.message);
+      toast.error(err.message);
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <>
+      <Loader loading={loading} />
+      <ToastContainer />
       <div className="container-fluid pt-5 is-cable-bg">
         <div className="row px-4 py-3 d-center mt-3">
           <div
@@ -70,7 +87,6 @@ function AdminLogin() {
                 onChange={(e) => setPassword(e.target.value)}
               />
               <br />
-              {error && <p style={{ color: "red" }}>{error}</p>}
               <button
                 type="submit"
                 className="btn w-100 text-white mb-3"
