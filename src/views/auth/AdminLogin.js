@@ -57,7 +57,7 @@ function AdminLogin() {
           >
             <div className="d-center pt-3">
               <img
-                src={require("assets/img/logo.png")}
+                src={require("assets/img/logo-red.png")}
                 height={80}
                 width={80}
                 alt="Logo"
