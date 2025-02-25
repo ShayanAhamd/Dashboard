@@ -26,8 +26,6 @@ function GenerateCode() {
   const [points, setPoints] = useState("");
   const [loading, setLoading] = useState(false);
   const [codesList, setCodesList] = useState([]);
-  console.log("codesList", codesList);
-
   const [totalCodes, setTotalCodes] = useState("");
   const [generatedCode, setGeneratedCode] = useState("");
 
@@ -40,14 +38,11 @@ function GenerateCode() {
       setCodesList(updatedCodes);
     });
 
-    return () => unsubscribe(); // Cleanup listener on component unmount
+    return () => unsubscribe();
   }, []);
 
-  // Generate unique random codes
   const handleGenerate = () => {
     const numCodes = parseInt(totalCodes, 10);
-
-    // Validate input
     if (isNaN(numCodes)) {
       toast.error("Please enter a valid number of codes to generate.");
       return;
@@ -61,20 +56,19 @@ function GenerateCode() {
       return;
     }
 
-    const existingCodes = new Set(codesList.map((code) => code.code)); // Get existing codes from Firestore
+    const existingCodes = new Set(codesList.map((code) => code.code));
     const newCodes = new Set();
 
     while (newCodes.size < numCodes) {
       const code = Math.random().toString(36).substring(2, 10).toUpperCase();
       if (!existingCodes.has(code)) {
-        newCodes.add(code); // Ensure uniqueness
+        newCodes.add(code);
       }
     }
 
-    setGeneratedCode(Array.from(newCodes).join(", ")); // Display generated codes
+    setGeneratedCode(Array.from(newCodes).join(", "));
   };
 
-  // Save generated codes to Firestore
   const handleSave = async () => {
     if (!generatedCode || !points) {
       toast.error("Please enter points before saving.");
@@ -86,7 +80,8 @@ function GenerateCode() {
       points: parseInt(points, 10),
       created_at: new Date(),
       status: true,
-      used: false, // Added 'used' field with initial value false
+      used: false,
+      user_id: "",
     }));
 
     try {
@@ -106,7 +101,6 @@ function GenerateCode() {
     }
   };
 
-  // Delete a code from Firestore
   const handleDelete = async (id) => {
     try {
       setLoading(true);
@@ -120,7 +114,6 @@ function GenerateCode() {
     }
   };
 
-  // Toggle Active/Inactive status in Firestore
   const handleToggleStatus = async (id, currentStatus) => {
     try {
       setLoading(true);
@@ -230,9 +223,17 @@ function GenerateCode() {
                   <Card.Title className="mr-4" as="h6">
                     <Button
                       variant="success"
-                      onClick={() =>
-                        exportToCSV(codesList, "generated_codes.csv")
-                      }
+                      onClick={() => {
+                        const formattedData = codesList.map((item) => ({
+                          ...item,
+                          created_at: item.created_at?.seconds
+                            ? new Date(
+                                item.created_at.seconds * 1000
+                              ).toLocaleDateString()
+                            : "N/A",
+                        }));
+                        exportToCSV(formattedData, "generated_codes.csv");
+                      }}
                     >
                       Download CSV
                     </Button>

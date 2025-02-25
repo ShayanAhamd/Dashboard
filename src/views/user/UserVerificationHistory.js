@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import React, { useState, useEffect } from "react";
 import {
   Card,
@@ -11,52 +11,120 @@ import {
   Form,
 } from "react-bootstrap";
 import { ToastContainer, toast } from "react-toastify";
+import { db, auth } from "config/FirebaseConfig";
+import {
+  collection,
+  query,
+  where,
+  getDocs,
+  updateDoc,
+  doc,
+} from "firebase/firestore";
+import Loader from "components/common/Loader";
+import { signOut } from "firebase/auth";
 
 function UserVerificationHistory() {
-  const [showModal, setShowModal] = useState(false);
+  const navigate = useNavigate();
+  const userId = auth.currentUser?.uid;
   const [code, setCode] = useState("");
   const [codes, setCodes] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [showModal, setShowModal] = useState(false);
 
   useEffect(() => {
-    const savedCodes =
-      JSON.parse(localStorage.getItem("verificationCodes")) || [];
-    setCodes(savedCodes);
-  }, []);
+    if (userId) {
+      fetchUserCodes();
+    }
+  }, [userId]);
+
+  const fetchUserCodes = async () => {
+    if (!userId) return;
+    setLoading(true);
+
+    try {
+      const q = query(collection(db, "codes"), where("user_id", "==", userId));
+      const querySnapshot = await getDocs(q);
+      const fetchedCodes = querySnapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+      setCodes(fetchedCodes);
+      setLoading(false);
+    } catch (error) {
+      console.error("Error fetching codes:", error);
+      toast.error("Failed to fetch codes.");
+      setLoading(false);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleClose = () => setShowModal(false);
   const handleShow = () => setShowModal(true);
 
-  const handleSave = () => {
-    const generatedCodes =
-      JSON.parse(localStorage.getItem("generatedCodes")) || [];
-
-    const isValidCode = generatedCodes.some(
-      (generatedCode) => generatedCode.code === code
-    );
-
-    if (!isValidCode) {
-      toast.error("Invalid code. Please enter a valid code.");
+  const handleVerifyCode = async () => {
+    if (!code) {
+      toast.error("Please enter a code.");
       return;
     }
+    setLoading(true);
 
-    const newCode = {
-      date: new Date().toISOString().split("T")[0],
-      code,
-      status: "Active",
-      point: 0,
-    };
+    try {
+      const q = query(collection(db, "codes"), where("code", "==", code));
+      const querySnapshot = await getDocs(q);
 
-    const updatedCodes = [...codes, newCode];
-    setCodes(updatedCodes);
-    localStorage.setItem("verificationCodes", JSON.stringify(updatedCodes));
-    setCode("");
-    setShowModal(false);
-    toast.success("Code saved successfully!");
+      if (querySnapshot.empty) {
+        toast.error("Invalid code. Please enter a valid code.");
+        setLoading(false);
+        return;
+      }
+
+      const docSnapshot = querySnapshot.docs[0];
+      const codeData = docSnapshot.data();
+
+      if (codeData.used) {
+        toast.error("This code has already been used.");
+        setLoading(false);
+        return;
+      }
+
+      if (!userId) {
+        toast.error("User not authenticated.");
+        setLoading(false);
+        return;
+      }
+
+      const codeRef = doc(db, "codes", docSnapshot.id);
+      await updateDoc(codeRef, { used: true, user_id: userId });
+
+      toast.success("Code verified successfully!");
+      fetchUserCodes();
+      setCode("");
+      setShowModal(false);
+      setLoading(false);
+    } catch (error) {
+      console.error("Error verifying code:", error);
+      toast.error("Error verifying code. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleLogout = async () => {
+    try {
+      await signOut(auth);
+      toast.success("Logged out successfully!");
+      navigate("/login");
+    } catch (error) {
+      console.error("Logout Error:", error);
+      toast.error("Failed to log out.");
+    }
   };
 
   return (
     <>
       <ToastContainer />
+      <Loader loading={loading} />
       <div className="container-fluid pt-3 is-cable-bg">
         <br />
         <div className="row px-4 py-3 d-center">
@@ -73,7 +141,6 @@ function UserVerificationHistory() {
               </Button>
               <Link
                 to="/edit-user"
-                type="submit"
                 className="btn text-white"
                 style={{
                   fontSize: 12,
@@ -84,8 +151,7 @@ function UserVerificationHistory() {
                 Profile
               </Link>
               <Link
-                to="/login"
-                type="submit"
+                onClick={handleLogout}
                 className="btn text-dark"
                 style={{
                   fontSize: 12,
@@ -109,28 +175,36 @@ function UserVerificationHistory() {
                         <thead>
                           <tr>
                             <th className="border-0 pl-4">Date</th>
-                            <th className="border-0">Code</th>
+                            <th className="border-0 pl-4">Code</th>
                             <th className="border-0">Status</th>
-                            <th className="border-0">Point</th>
+                            <th className="border-0">Points</th>
                           </tr>
                         </thead>
                         {codes.length > 0 ? (
                           <tbody>
-                            {codes.map((entry, index) => (
-                              <tr key={index}>
-                                <td className="pl-4">{entry.date}</td>
-                                <td>{entry.code}</td>
-                                <td className="text-warning">{entry.status}</td>
-                                <td className="pl-4">{entry.point}</td>
+                            {codes.map((entry) => (
+                              <tr key={entry.id}>
+                                <td className="pl-4">
+                                  {new Date(
+                                    entry.created_at.seconds * 1000
+                                  ).toLocaleString()}
+                                </td>
+                                <td className="pl-4">{entry.code}</td>
+                                <td className="text-success">
+                                  {entry.used ? "Verified" : "No"}
+                                </td>
+                                <td>{entry.points}</td>
                               </tr>
                             ))}
                           </tbody>
                         ) : (
-                          <tr>
-                            <td colSpan="7" className="text-center">
-                              No code added yet
-                            </td>
-                          </tr>
+                          <thead>
+                            <tr>
+                              <td colSpan="4" className="text-center">
+                                No codes available
+                              </td>
+                            </tr>
+                          </thead>
                         )}
                       </Table>
                     </Card.Body>
@@ -143,12 +217,12 @@ function UserVerificationHistory() {
       </div>
       <Modal show={showModal} onHide={handleClose}>
         <Modal.Header closeButton>
-          <Modal.Title>Add Code</Modal.Title>
+          <Modal.Title>Verify Code</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <Form>
             <Form.Group>
-              <Form.Label>Add Code</Form.Label>
+              <Form.Label>Enter Code</Form.Label>
               <Form.Control
                 type="text"
                 value={code}
@@ -162,8 +236,8 @@ function UserVerificationHistory() {
           <Button variant="secondary" onClick={handleClose}>
             Cancel
           </Button>
-          <Button variant="primary" onClick={handleSave}>
-            Save
+          <Button variant="primary" onClick={handleVerifyCode}>
+            Verify
           </Button>
         </Modal.Footer>
       </Modal>

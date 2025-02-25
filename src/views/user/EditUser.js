@@ -1,75 +1,78 @@
 import { Link, useNavigate } from "react-router-dom";
 import React, { useEffect, useState } from "react";
 import { ToastContainer, toast } from "react-toastify";
+import { db, auth } from "config/FirebaseConfig";
+import { doc, getDoc, updateDoc } from "firebase/firestore";
+import Loader from "components/common/Loader";
 
 function EditUser() {
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [cnic, setCnic] = useState("");
-  const [phone, setPhone] = useState("");
-  const [dealerName, setDealerName] = useState("");
-  const [city, setCity] = useState("");
-  const [address, setAddress] = useState("");
-  const [error, setError] = useState("");
   const navigate = useNavigate();
+  const [name, setName] = useState("");
+  const [cnic, setCnic] = useState("");
+  const [city, setCity] = useState("");
+  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
+  const [address, setAddress] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [dealerName, setDealerName] = useState("");
 
-  // Fetch user data from local storage when the component mounts
   useEffect(() => {
-    const loggedInUser = JSON.parse(localStorage.getItem("loggedInUser"));
-    if (loggedInUser) {
-      setName(loggedInUser.Name);
-      setEmail(loggedInUser.Email);
-      setPassword(loggedInUser.Password);
-      setCnic(loggedInUser.CNIC);
-      setPhone(loggedInUser.Phone);
-      setDealerName(loggedInUser.DealerName);
-      setCity(loggedInUser.City || "");
-      setAddress(loggedInUser.Address || "");
-    }
+    const fetchUserData = async () => {
+      setLoading(true);
+      const user = auth.currentUser;
+      if (user) {
+        const userRef = doc(db, "users", user.uid);
+        const userSnap = await getDoc(userRef);
+        if (userSnap.exists()) {
+          const userData = userSnap.data();
+          setName(userData.name || "");
+          setEmail(userData.email || "");
+          setCnic(userData.cnic || "");
+          setPhone(userData.phone || "");
+          setDealerName(userData.dealerName || "");
+          setCity(userData.city || "");
+          setAddress(userData.address || "");
+        } else {
+          toast.error("User data not found.");
+        }
+      }
+      setLoading(false);
+    };
+    fetchUserData();
   }, []);
 
-  // Handle form submission
-  const handleUpdate = (e) => {
+  const handleUpdate = async (e) => {
     e.preventDefault();
-
-    // Validate form fields
-    if (
-      !name ||
-      !email ||
-      !password ||
-      !cnic ||
-      !phone ||
-      !dealerName ||
-      !city ||
-      !address
-    ) {
+    if (!name || !phone || !dealerName || !city || !address) {
       toast.error("All fields are required.");
       return;
     }
-
-    const updatedUserData = {
-      Name: name,
-      Email: email,
-      Password: password,
-      CNIC: cnic,
-      Phone: phone,
-      DealerName: dealerName,
-      City: city,
-      Address: address,
-      is_admin: false, // Preserve existing fields
-      created_at: new Date().toISOString(), // Preserve existing fields
-    };
-
-    // Update user data in local storage
-    localStorage.setItem("loggedInUser", JSON.stringify(updatedUserData));
-    toast.success("Profile updated successfully!");
-    setTimeout(() => navigate("/user-history"), 3000); // Redirect to profile page after update
+    setLoading(true);
+    try {
+      const user = auth.currentUser;
+      if (user) {
+        const userRef = doc(db, "users", user.uid);
+        await updateDoc(userRef, {
+          name,
+          phone,
+          dealerName,
+          city,
+          address,
+        });
+        toast.success("Profile updated successfully!");
+        setTimeout(() => navigate("/user-history"), 2000);
+      }
+    } catch (error) {
+      toast.error("Error updating profile. Please try again.");
+      console.error("Update Error:", error);
+    }
+    setLoading(false);
   };
 
   return (
     <>
       <ToastContainer />
+      <Loader loading={loading} />
       <div className="container-fluid is-cable-bg">
         <div className="row px-4 py-3 d-center">
           <div
@@ -99,23 +102,20 @@ function EditUser() {
                 <div className="col-md-6 col-12">
                   <label className="mb-0 mt-2">Full Name</label>
                   <input
-                    required
                     type="text"
                     value={name}
-                    placeholder="Full Name"
                     className="form-control"
                     onChange={(e) => setName(e.target.value)}
+                    required
                   />
                 </div>
                 <div className="col-md-6 col-12">
                   <label className="mb-0 mt-2">Email</label>
                   <input
-                    required
-                    disabled
                     type="email"
                     value={email}
                     className="form-control"
-                    placeholder="Email"
+                    disabled
                   />
                 </div>
               </div>
@@ -123,23 +123,20 @@ function EditUser() {
                 <div className="col-md-6 col-12">
                   <label className="mb-0 mt-2">CNIC</label>
                   <input
-                    required
-                    disabled
                     type="text"
                     value={cnic}
                     className="form-control"
-                    placeholder="12345-6789012-3"
+                    disabled
                   />
                 </div>
                 <div className="col-md-6 col-12">
                   <label className="mb-0 mt-2">City</label>
                   <input
                     type="text"
-                    placeholder="City"
-                    className="form-control"
-                    required
                     value={city}
+                    className="form-control"
                     onChange={(e) => setCity(e.target.value)}
+                    required
                   />
                 </div>
               </div>
@@ -147,23 +144,21 @@ function EditUser() {
                 <div className="col-md-6 col-12">
                   <label className="mb-0 mt-2">Address</label>
                   <input
-                    required
                     type="text"
                     value={address}
-                    placeholder="Address"
                     className="form-control"
                     onChange={(e) => setAddress(e.target.value)}
+                    required
                   />
                 </div>
                 <div className="col-md-6 col-12">
                   <label className="mb-0 mt-2">Phone Number</label>
                   <input
                     type="text"
-                    className="form-control"
-                    required
-                    onChange={(e) => setPhone(e.target.value)}
                     value={phone}
-                    placeholder="Phone Number"
+                    className="form-control"
+                    onChange={(e) => setPhone(e.target.value)}
+                    required
                   />
                 </div>
               </div>
@@ -172,9 +167,8 @@ function EditUser() {
                 type="text"
                 value={dealerName}
                 className="form-control"
-                required
-                placeholder="Dealer Name"
                 onChange={(e) => setDealerName(e.target.value)}
+                required
               />
               <br />
               <div className="d-end">
@@ -186,8 +180,9 @@ function EditUser() {
                     border: "none",
                     backgroundColor: "rgb(26 54 93)",
                   }}
+                  disabled={loading}
                 >
-                  Update
+                  {loading ? "Updating..." : "Update"}
                 </button>
               </div>
             </form>
