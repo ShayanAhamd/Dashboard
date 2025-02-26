@@ -228,17 +228,9 @@ function GenerateCode() {
                   <Card.Title className="mr-4" as="h6">
                     <Button
                       variant="success"
-                      onClick={() => {
-                        const formattedData = codesList.map((item) => ({
-                          ...item,
-                          created_at: item.created_at?.seconds
-                            ? new Date(
-                                item.created_at.seconds * 1000
-                              ).toLocaleDateString()
-                            : "N/A",
-                        }));
-                        exportToCSV(formattedData, "generated_codes.csv");
-                      }}
+                      onClick={() =>
+                        exportToCSV(codesList, "generated_codes.csv")
+                      }
                     >
                       Download CSV
                     </Button>
@@ -296,7 +288,7 @@ function GenerateCode() {
                             </Tooltip>
                           </td>
                           <td>
-                            <span data-tooltip-id="delete-tooltip">
+                            <span data-tooltip-id={`delete-tooltip-${item.id}`}>
                               <Button
                                 variant="danger"
                                 size="sm"
@@ -308,7 +300,10 @@ function GenerateCode() {
                               </Button>
                             </span>
 
-                            <Tooltip id="delete-tooltip" place="top">
+                            <Tooltip
+                              id={`delete-tooltip-${item.id}`}
+                              place="top"
+                            >
                               {item.is_used
                                 ? "This code has already been used and cannot be deleted."
                                 : ""}
