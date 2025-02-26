@@ -42,7 +42,7 @@ function UserVerificationHistory() {
     setLoading(true);
 
     try {
-      const q = query(collection(db, "codes"), where("user_id", "==", userId));
+      const q = query(collection(db, "codes"), where("used_by", "==", userId));
       const querySnapshot = await getDocs(q);
       const fetchedCodes = querySnapshot.docs.map((doc) => ({
         id: doc.id,
@@ -82,8 +82,16 @@ function UserVerificationHistory() {
       const docSnapshot = querySnapshot.docs[0];
       const codeData = docSnapshot.data();
 
-      if (codeData.used) {
+      // Check if the code is already used
+      if (codeData.is_used) {
         toast.error("This code has already been used.");
+        setLoading(false);
+        return;
+      }
+
+      // Check if the code status is true
+      if (!codeData.status) {
+        toast.error("This code is inactive and cannot be used.");
         setLoading(false);
         return;
       }
@@ -94,11 +102,16 @@ function UserVerificationHistory() {
         return;
       }
 
+      // Update the code with is_used and used_by fields
       const codeRef = doc(db, "codes", docSnapshot.id);
-      await updateDoc(codeRef, { used: true, user_id: userId });
+      await updateDoc(codeRef, {
+        is_used: true,
+        used_by: userId,
+        used_at: new Date(),
+      });
 
       toast.success("Code verified successfully!");
-      fetchUserCodes();
+      fetchUserCodes(); // Refresh the list of codes
       setCode("");
       setShowModal(false);
       setLoading(false);
@@ -186,12 +199,12 @@ function UserVerificationHistory() {
                               <tr key={entry.id}>
                                 <td className="pl-4">
                                   {new Date(
-                                    entry.created_at.seconds * 1000
+                                    entry.used_at.seconds * 1000
                                   ).toLocaleString()}
                                 </td>
                                 <td className="pl-4">{entry.code}</td>
                                 <td className="text-success">
-                                  {entry.used ? "Verified" : "No"}
+                                  {entry.is_used ? "Verified" : "No"}
                                 </td>
                                 <td>{entry.points}</td>
                               </tr>

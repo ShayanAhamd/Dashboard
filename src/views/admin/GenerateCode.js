@@ -1,5 +1,3 @@
-import React, { useState, useEffect } from "react";
-import "bootstrap/dist/css/bootstrap.min.css";
 import {
   Form,
   Card,
@@ -9,8 +7,6 @@ import {
   Table,
   Button,
 } from "react-bootstrap";
-import { exportToCSV } from "utils/genralHelper";
-import { db } from "config/FirebaseConfig";
 import {
   collection,
   addDoc,
@@ -19,8 +15,13 @@ import {
   updateDoc,
   onSnapshot,
 } from "firebase/firestore";
-import { toast, ToastContainer } from "react-toastify";
+import { Tooltip } from "react-tooltip";
+import { db } from "config/FirebaseConfig";
+import "bootstrap/dist/css/bootstrap.min.css";
 import Loader from "components/common/Loader";
+import { exportToCSV } from "utils/genralHelper";
+import React, { useState, useEffect } from "react";
+import { toast, ToastContainer } from "react-toastify";
 
 function GenerateCode() {
   const [points, setPoints] = useState("");
@@ -31,10 +32,13 @@ function GenerateCode() {
 
   useEffect(() => {
     const unsubscribe = onSnapshot(collection(db, "codes"), (snapshot) => {
-      const updatedCodes = snapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      }));
+      const updatedCodes = snapshot.docs
+        .map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }))
+        .sort((a, b) => b.points - a.points);
+
       setCodesList(updatedCodes);
     });
 
@@ -80,8 +84,9 @@ function GenerateCode() {
       points: parseInt(points, 10),
       created_at: new Date(),
       status: true,
-      used: false,
-      user_id: "",
+      is_used: false,
+      used_by: "",
+      is_downloaded: false,
     }));
 
     try {
@@ -248,6 +253,7 @@ function GenerateCode() {
                       <th>Code</th>
                       <th>Points</th>
                       <th>Created At</th>
+                      <th>Downloaded</th>
                       <th>Used</th>
                       <th>Status</th>
                       <th>Actions</th>
@@ -263,33 +269,56 @@ function GenerateCode() {
                           <td>
                             {new Date(item.created_at * 1000).toLocaleString()}
                           </td>
-                          <td>{item.used == true ? "Yes" : "No"}</td>
+                          <td>{item.is_downloaded == true ? "Yes" : "No"}</td>
+                          <td>{item.is_used == true ? "Yes" : "No"}</td>
                           <td>
-                            <label className="switch">
-                              <input
-                                type="checkbox"
-                                checked={item.status}
-                                onChange={() =>
-                                  handleToggleStatus(item.id, item.status)
-                                }
-                              />
-                              <span className="slider"></span>
-                            </label>
+                            <span data-tooltip-id={`status-tooltip-${item.id}`}>
+                              <label className="switch">
+                                <input
+                                  type="checkbox"
+                                  checked={item.status}
+                                  disabled={item.is_used}
+                                  onChange={() =>
+                                    handleToggleStatus(item.id, item.status)
+                                  }
+                                />
+                                <span className="slider"></span>
+                              </label>
+                            </span>
+
+                            <Tooltip
+                              id={`status-tooltip-${item.id}`}
+                              place="top"
+                            >
+                              {item.is_used
+                                ? "This code has already been used and its status cannot be changed."
+                                : ""}
+                            </Tooltip>
                           </td>
                           <td>
-                            <Button
-                              variant="danger"
-                              size="sm"
-                              onClick={() => handleDelete(item.id)}
-                            >
-                              Delete
-                            </Button>
+                            <span data-tooltip-id="delete-tooltip">
+                              <Button
+                                variant="danger"
+                                size="sm"
+                                disabled={item.is_used}
+                                style={{ color: "red" }}
+                                onClick={() => handleDelete(item.id)}
+                              >
+                                Delete
+                              </Button>
+                            </span>
+
+                            <Tooltip id="delete-tooltip" place="top">
+                              {item.is_used
+                                ? "This code has already been used and cannot be deleted."
+                                : ""}
+                            </Tooltip>
                           </td>
                         </tr>
                       ))
                     ) : (
                       <tr>
-                        <td colSpan="7" className="text-center">
+                        <td colSpan="8" className="text-center">
                           No codes generated yet
                         </td>
                       </tr>

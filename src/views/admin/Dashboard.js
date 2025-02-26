@@ -12,6 +12,7 @@ import {
   Title,
   Tooltip,
   Legend,
+  ArcElement,
 } from "chart.js";
 
 ChartJS.register(
@@ -20,7 +21,8 @@ ChartJS.register(
   BarElement,
   Title,
   Tooltip,
-  Legend
+  Legend,
+  ArcElement
 );
 
 function Dashboard() {
@@ -28,6 +30,15 @@ function Dashboard() {
   const [usersLastWeek, setUsersLastWeek] = useState(0);
   const [activeSessions, setActiveSessions] = useState(0);
   const [monthlyUserData, setMonthlyUserData] = useState(Array(12).fill(0));
+  const [codeStats, setCodeStats] = useState({
+    totalCodes: 0,
+    usedCodes: 0,
+    unusedCodes: 0,
+    activeCodes: 0,
+    inactiveCodes: 0,
+    downloadedCodes: 0,
+    notDownloadedCodes: 0,
+  });
 
   useEffect(() => {
     const fetchUserStats = async () => {
@@ -72,7 +83,38 @@ function Dashboard() {
       }
     };
 
+    const fetchCodeStats = async () => {
+      try {
+        const codesRef = collection(db, "codes");
+        const codesSnapshot = await getDocs(codesRef);
+        let totalCodes = codesSnapshot.size;
+        let usedCodes = 0;
+        let activeCodes = 0;
+        let downloadedCodes = 0;
+
+        codesSnapshot.docs.forEach((doc) => {
+          const codeData = doc.data();
+          if (codeData.is_used) usedCodes += 1;
+          if (codeData.status) activeCodes += 1;
+          if (codeData.is_downloaded) downloadedCodes += 1;
+        });
+
+        setCodeStats({
+          totalCodes,
+          usedCodes,
+          unusedCodes: totalCodes - usedCodes,
+          activeCodes,
+          inactiveCodes: totalCodes - activeCodes,
+          downloadedCodes,
+          notDownloadedCodes: totalCodes - downloadedCodes,
+        });
+      } catch (error) {
+        console.error("Error fetching code stats:", error);
+      }
+    };
+
     fetchUserStats();
+    fetchCodeStats();
   }, []);
 
   const chartData = {
@@ -97,6 +139,40 @@ function Dashboard() {
         backgroundColor: "rgba(75, 192, 192, 0.6)",
         borderColor: "rgba(75, 192, 192, 1)",
         borderWidth: 1,
+      },
+    ],
+  };
+
+  const pieChartData = {
+    labels: [
+      "Total Codes",
+      "Used Codes",
+      "Unused Codes",
+      "Active Codes",
+      "Inactive Codes",
+      "Downloaded Codes",
+      "Not Downloaded Codes",
+    ],
+    datasets: [
+      {
+        data: [
+          codeStats.totalCodes,
+          codeStats.usedCodes,
+          codeStats.unusedCodes,
+          codeStats.activeCodes,
+          codeStats.inactiveCodes,
+          codeStats.downloadedCodes,
+          codeStats.notDownloadedCodes,
+        ],
+        backgroundColor: [
+          "#FF6384",
+          "#36A2EB",
+          "#FFCE56",
+          "#4BC0C0",
+          "#9966FF",
+          "#E67E22",
+          "#8E44AD",
+        ],
       },
     ],
   };
@@ -250,11 +326,11 @@ function Dashboard() {
                 <Card.Title as="h4">Users</Card.Title>
                 <p className="card-category">Users Registered</p>
               </Card.Header>
-              <Card.Body>
+              <Card.Body
+                className="d-center"
+                style={{ maxWidth: "500px", height: 278 }}
+              >
                 <Bar data={chartData} options={chartOptions} />
-                <div className="d-center text-info" style={{ fontSize: 12 }}>
-                  Total Users {totalUsers}
-                </div>
               </Card.Body>
               <Card.Footer>
                 <div className="legend">
@@ -269,7 +345,12 @@ function Dashboard() {
               <Card.Header>
                 <Card.Title as="h4">Codes</Card.Title>
               </Card.Header>
-              <Card.Body>{/* <Pie /> */}</Card.Body>
+              <Card.Body
+                className="d-center"
+                style={{ maxWidth: "500px", height: 347 }}
+              >
+                <Pie data={pieChartData} />
+              </Card.Body>
             </Card>
           </Col>
         </Row>
