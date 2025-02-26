@@ -6,6 +6,7 @@ import {
   Col,
   Table,
   Button,
+  Pagination,
 } from "react-bootstrap";
 import {
   collection,
@@ -29,6 +30,8 @@ function GenerateCode() {
   const [codesList, setCodesList] = useState([]);
   const [totalCodes, setTotalCodes] = useState("");
   const [generatedCode, setGeneratedCode] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 20;
 
   useEffect(() => {
     const unsubscribe = onSnapshot(collection(db, "codes"), (snapshot) => {
@@ -130,6 +133,15 @@ function GenerateCode() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = codesList.slice(indexOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(codesList.length / itemsPerPage);
+
+  const handlePageChange = (pageNumber) => {
+    setCurrentPage(pageNumber);
   };
 
   return (
@@ -252,8 +264,8 @@ function GenerateCode() {
                     </tr>
                   </thead>
                   <tbody>
-                    {codesList.length > 0 ? (
-                      codesList.map((item, index) => (
+                    {currentItems.length > 0 ? (
+                      currentItems.map((item, index) => (
                         <tr key={item.id}>
                           <td>{index + 1}</td>
                           <td>{item.code}</td>
@@ -327,6 +339,34 @@ function GenerateCode() {
               </Card.Body>
             </Card>
           </Col>
+          {/* Pagination */}
+          <Pagination className="justify-content-center mt-3">
+            <Pagination.First
+              onClick={() => handlePageChange(1)}
+              disabled={currentPage === 1}
+            />
+            <Pagination.Prev
+              onClick={() => handlePageChange(currentPage - 1)}
+              disabled={currentPage === 1}
+            />
+            {[...Array(totalPages).keys()].map((num) => (
+              <Pagination.Item
+                key={num + 1}
+                active={num + 1 === currentPage}
+                onClick={() => handlePageChange(num + 1)}
+              >
+                {num + 1}
+              </Pagination.Item>
+            ))}
+            <Pagination.Next
+              onClick={() => handlePageChange(currentPage + 1)}
+              disabled={currentPage === totalPages}
+            />
+            <Pagination.Last
+              onClick={() => handlePageChange(totalPages)}
+              disabled={currentPage === totalPages}
+            />
+          </Pagination>
         </Row>
       </Container>
     </>
