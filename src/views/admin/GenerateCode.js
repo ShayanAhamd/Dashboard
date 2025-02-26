@@ -16,6 +16,7 @@ import {
   updateDoc,
   onSnapshot,
 } from "firebase/firestore";
+import Swal from "sweetalert";
 import { Tooltip } from "react-tooltip";
 import { db } from "config/FirebaseConfig";
 import "bootstrap/dist/css/bootstrap.min.css";
@@ -25,13 +26,15 @@ import React, { useState, useEffect } from "react";
 import { toast, ToastContainer } from "react-toastify";
 
 function GenerateCode() {
+  const itemsPerPage = 20;
   const [points, setPoints] = useState("");
   const [loading, setLoading] = useState(false);
   const [codesList, setCodesList] = useState([]);
   const [totalCodes, setTotalCodes] = useState("");
-  const [generatedCode, setGeneratedCode] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 20;
+  const [deleteMultiple, setDeleteMultiple] = useState(false);
+  const [generatedCode, setGeneratedCode] = useState("");
+  const [selectedCodes, setSelectedCodes] = useState([]);
 
   useEffect(() => {
     const unsubscribe = onSnapshot(collection(db, "codes"), (snapshot) => {
@@ -47,6 +50,12 @@ function GenerateCode() {
 
     return () => unsubscribe();
   }, []);
+
+  const handleSelectCode = (id) => {
+    setSelectedCodes((prev) =>
+      prev.includes(id) ? prev.filter((code) => code !== id) : [...prev, id]
+    );
+  };
 
   const handleGenerate = () => {
     const numCodes = parseInt(totalCodes, 10);
@@ -74,6 +83,37 @@ function GenerateCode() {
     }
 
     setGeneratedCode(Array.from(newCodes).join(", "));
+  };
+
+  const handleDeleteMultiple = async () => {
+    if (selectedCodes.length === 0) {
+      toast.error("No codes selected for deletion.");
+      return;
+    }
+
+    swal({
+      title: "Are you sure?",
+      text: `You are about to delete ${selectedCodes.length} selected codes. This action cannot be undone!`,
+      icon: "warning",
+      buttons: ["Cancel", "Yes, delete them!"],
+      dangerMode: true,
+    }).then(async (willDelete) => {
+      if (willDelete) {
+        try {
+          setLoading(true);
+          await Promise.all(
+            selectedCodes.map((id) => deleteDoc(doc(db, "codes", id)))
+          );
+          toast.success("Selected codes deleted successfully!");
+          setSelectedCodes([]);
+        } catch (error) {
+          console.error("Error deleting multiple codes:", error);
+          toast.error("Failed to delete selected codes.");
+        } finally {
+          setLoading(false);
+        }
+      }
+    });
   };
 
   const handleSave = async () => {
@@ -139,7 +179,6 @@ function GenerateCode() {
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentItems = codesList.slice(indexOfFirstItem, indexOfLastItem);
   const totalPages = Math.ceil(codesList.length / itemsPerPage);
-
   const handlePageChange = (pageNumber) => {
     setCurrentPage(pageNumber);
   };
@@ -236,23 +275,40 @@ function GenerateCode() {
                     <span>Generated Codes</span>
                   </h4>
                 </Card.Title>
-                {codesList.length > 0 && (
-                  <Card.Title className="mr-4" as="h6">
+                <div className="d-flex">
+                  {selectedCodes.length > 0 && (
                     <Button
-                      variant="success"
-                      onClick={() =>
-                        exportToCSV(codesList, "generated_codes.csv")
-                      }
+                      variant="danger"
+                      className="btn-sm"
+                      onClick={handleDeleteMultiple}
+                      disabled={selectedCodes.length === 0}
                     >
-                      Download CSV
+                      Delete Selected
                     </Button>
-                  </Card.Title>
-                )}
+                  )}
+                  {codesList.length > 0 && (
+                    <Card.Title className="mr-4" as="h6">
+                      <Button
+                        variant="success"
+                        className="btn-sm"
+                        style={{ marginLeft: 10 }}
+                        onClick={() =>
+                          exportToCSV(codesList, "generated_codes.csv")
+                        }
+                      >
+                        Download CSV
+                      </Button>
+                    </Card.Title>
+                  )}
+                </div>
               </Card.Header>
               <Card.Body className="table-full-width table-responsive px-0">
                 <Table className="table-hover table-striped">
                   <thead>
                     <tr>
+                      <th>
+                        <Form.Check type="checkbox" disabled />
+                      </th>
                       <th>#</th>
                       <th>Code</th>
                       <th>Points</th>
@@ -267,6 +323,13 @@ function GenerateCode() {
                     {currentItems.length > 0 ? (
                       currentItems.map((item, index) => (
                         <tr key={item.id}>
+                          <td>
+                            <Form.Check
+                              type="checkbox"
+                              checked={selectedCodes.includes(item.id)}
+                              onChange={() => handleSelectCode(item.id)}
+                            />
+                          </td>
                           <td>{index + 1}</td>
                           <td>{item.code}</td>
                           <td>{item.points}</td>
@@ -277,8 +340,8 @@ function GenerateCode() {
                                 ).toLocaleString()
                               : "N/A"}
                           </td>
-                          <td>{item.is_downloaded == true ? "Yes" : "No"}</td>
-                          <td>{item.is_used == true ? "Yes" : "No"}</td>
+                          <td>{item.is_downloaded ? "Yes" : "No"}</td>
+                          <td>{item.is_used ? "Yes" : "No"}</td>
                           <td>
                             <span data-tooltip-id={`status-tooltip-${item.id}`}>
                               <label className="switch">
