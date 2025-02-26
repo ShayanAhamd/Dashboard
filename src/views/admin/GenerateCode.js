@@ -259,7 +259,11 @@ function GenerateCode() {
                           <td>{item.code}</td>
                           <td>{item.points}</td>
                           <td>
-                            {new Date(item.created_at * 1000).toLocaleString()}
+                            {item.created_at?.seconds
+                              ? new Date(
+                                  item.created_at.seconds * 1000
+                                ).toLocaleString()
+                              : "N/A"}
                           </td>
                           <td>{item.is_downloaded == true ? "Yes" : "No"}</td>
                           <td>{item.is_used == true ? "Yes" : "No"}</td>

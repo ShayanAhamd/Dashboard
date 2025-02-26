@@ -1,9 +1,83 @@
-import React from "react";
+import { db } from "config/FirebaseConfig";
+import Loader from "components/common/Loader";
+import React, { useState, useEffect } from "react";
 import { Card, Container, Row, Col, Table } from "react-bootstrap";
+import { collection, getDocs, doc, getDoc } from "firebase/firestore";
 
 function CodePoints() {
+  const [loading, setLoading] = useState(false);
+  const [userStats, setUserStats] = useState([]);
+
+  useEffect(() => {
+    const fetchUserStats = async () => {
+      setLoading(true);
+      try {
+        const codesSnapshot = await getDocs(collection(db, "codes"));
+        const codes = codesSnapshot.docs
+          .map((doc) => ({ id: doc.id, ...doc.data() }))
+          .filter((code) => code.is_used && code.used_by);
+
+        const userMap = {};
+
+        codes.forEach((code) => {
+          const userId = code.used_by;
+
+          if (!userMap[userId]) {
+            userMap[userId] = {
+              totalPoints: 0,
+              totalCodesUsed: 0,
+              lastUsedAt: null,
+            };
+          }
+
+          userMap[userId].totalPoints += code.points || 0;
+          userMap[userId].totalCodesUsed += 1;
+
+          if (
+            !userMap[userId].lastUsedAt ||
+            code.used_at?.seconds > userMap[userId].lastUsedAt
+          ) {
+            userMap[userId].lastUsedAt = code.used_at?.seconds || null;
+          }
+        });
+
+        const userData = {};
+
+        await Promise.all(
+          Object.keys(userMap).map(async (userId) => {
+            const userRef = doc(db, "users", userId);
+            const userSnap = await getDoc(userRef);
+            userData[userId] = userSnap.exists()
+              ? userSnap.data().name || "Unknown User"
+              : "Unknown User";
+          })
+        );
+
+        const formattedData = Object.keys(userMap).map((userId, index) => ({
+          id: index + 1,
+          name: userData[userId] || "Unknown User",
+          totalPoints: userMap[userId].totalPoints,
+          totalCodesUsed: userMap[userId].totalCodesUsed,
+          lastUpdated: userMap[userId].lastUsedAt
+            ? new Date(userMap[userId].lastUsedAt * 1000).toLocaleDateString()
+            : "N/A",
+        }));
+        setLoading(false);
+        setUserStats(formattedData);
+      } catch (error) {
+        console.error("Error fetching user stats:", error);
+        setLoading(false);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUserStats();
+  }, []);
+
   return (
     <>
+      <Loader loading={loading} />
       <Container fluid>
         <h3 className="mt-0">QR Generator Types</h3>
         <Row>
@@ -29,7 +103,7 @@ function CodePoints() {
                 </Row>
               </Card.Body>
               <Card.Footer>
-                <hr></hr>
+                <hr />
                 <div className="stats">Generate standard QR codes</div>
               </Card.Footer>
             </Card>
@@ -56,7 +130,7 @@ function CodePoints() {
                 </Row>
               </Card.Body>
               <Card.Footer>
-                <hr></hr>
+                <hr />
                 <div className="stats">
                   Generate advanced QR codes with customization
                 </div>
@@ -68,7 +142,7 @@ function CodePoints() {
           <Col md="12">
             <Card className="strpied-tabled-with-hover">
               <Card.Header>
-                <Card.Title as="h4">Verification History</Card.Title>
+                <Card.Title as="h4">User Verification Stats</Card.Title>
               </Card.Header>
               <Card.Body className="table-full-width table-responsive px-0">
                 <Table className="table-hover table-striped">
@@ -77,32 +151,28 @@ function CodePoints() {
                       <th className="border-0">ID</th>
                       <th className="border-0">User Name</th>
                       <th className="border-0">Total Points</th>
-                      <th className="border-0">QR Codes Genrated</th>
-                      <th className="border-0">Last Updated</th>
+                      <th className="border-0">Codes Used</th>
+                      <th className="border-0">Last Used At</th>
                     </tr>
                   </thead>
                   <tbody>
-                    <tr>
-                      <td>1</td>
-                      <td>Dakota Rice</td>
-                      <td>23</td>
-                      <td>20</td>
-                      <td>2021-02-25</td>
-                    </tr>
-                    <tr>
-                      <td>4</td>
-                      <td>Job hit</td>
-                      <td>18</td>
-                      <td>92</td>
-                      <td>2023-09-15</td>
-                    </tr>
-                    <tr>
-                      <td>3</td>
-                      <td>Jade sit</td>
-                      <td>08</td>
-                      <td>52</td>
-                      <td>2025-02-05</td>
-                    </tr>
+                    {userStats.length > 0 ? (
+                      userStats.map((user) => (
+                        <tr key={user.id}>
+                          <td>{user.id}</td>
+                          <td>{user.name}</td>
+                          <td>{user.totalPoints}</td>
+                          <td>{user.totalCodesUsed}</td>
+                          <td>{user.lastUpdated}</td>
+                        </tr>
+                      ))
+                    ) : (
+                      <tr>
+                        <td colSpan="5" className="text-center">
+                          No user verification data available
+                        </td>
+                      </tr>
+                    )}
                   </tbody>
                 </Table>
               </Card.Body>
