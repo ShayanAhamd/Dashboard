@@ -330,7 +330,7 @@ function GenerateCode() {
                               onChange={() => handleSelectCode(item.id)}
                             />
                           </td>
-                          <td>{index + 1}</td>
+                          <td>{indexOfFirstItem + index + 1}</td>
                           <td>{item.code}</td>
                           <td>{item.points}</td>
                           <td>

@@ -1,12 +1,22 @@
 import { db } from "config/FirebaseConfig";
 import Loader from "components/common/Loader";
 import React, { useState, useEffect } from "react";
-import { Card, Container, Row, Col, Table } from "react-bootstrap";
+import {
+  Card,
+  Container,
+  Row,
+  Col,
+  Table,
+  Form,
+  Button,
+} from "react-bootstrap";
 import { collection, getDocs, doc, getDoc } from "firebase/firestore";
 
 function CodePoints() {
   const [loading, setLoading] = useState(false);
   const [userStats, setUserStats] = useState([]);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [filteredStats, setFilteredStats] = useState([]);
 
   useEffect(() => {
     const fetchUserStats = async () => {
@@ -64,6 +74,7 @@ function CodePoints() {
         }));
         setLoading(false);
         setUserStats(formattedData);
+        setFilteredStats(formattedData);
       } catch (error) {
         console.error("Error fetching user stats:", error);
         setLoading(false);
@@ -74,6 +85,13 @@ function CodePoints() {
 
     fetchUserStats();
   }, []);
+
+  const handleSearch = () => {
+    const results = userStats.filter((user) =>
+      user.name.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+    setFilteredStats(results);
+  };
 
   return (
     <>
@@ -141,9 +159,28 @@ function CodePoints() {
         <Row>
           <Col md="12">
             <Card className="strpied-tabled-with-hover">
-              <Card.Header>
-                <Card.Title as="h4">User Verification Stats</Card.Title>
-              </Card.Header>
+              <div className="d-space-between">
+                <Card.Header>
+                  <Card.Title as="h4">User Verification Stats</Card.Title>
+                </Card.Header>
+                <Card.Header>
+                  <Form.Group className="d-flex">
+                    <Form.Control
+                      type="text"
+                      placeholder="Search..."
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                    />
+                    <Button
+                      variant="danger"
+                      className="btn-fill pull-right py-1"
+                      onClick={handleSearch}
+                    >
+                      <i className="fa fa-search text-white"></i>
+                    </Button>
+                  </Form.Group>
+                </Card.Header>
+              </div>
               <Card.Body className="table-full-width table-responsive px-0">
                 <Table className="table-hover table-striped">
                   <thead>
@@ -156,8 +193,8 @@ function CodePoints() {
                     </tr>
                   </thead>
                   <tbody>
-                    {userStats.length > 0 ? (
-                      userStats.map((user) => (
+                    {filteredStats.length > 0 ? (
+                      filteredStats.map((user) => (
                         <tr key={user.id}>
                           <td>{user.id}</td>
                           <td>{user.name}</td>

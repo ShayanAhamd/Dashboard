@@ -1,12 +1,22 @@
 import { db } from "config/FirebaseConfig";
 import Loader from "components/common/Loader";
 import React, { useState, useEffect } from "react";
-import { Card, Table, Container, Row, Col } from "react-bootstrap";
+import {
+  Card,
+  Table,
+  Container,
+  Row,
+  Col,
+  Form,
+  Button,
+} from "react-bootstrap";
 import { collection, getDocs, doc, getDoc } from "firebase/firestore";
 
 function History() {
   const [loading, setLoading] = useState(false);
   const [historyData, setHistoryData] = useState([]);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [filteredHistory, setFilteredHistory] = useState([]);
 
   useEffect(() => {
     const fetchHistory = async () => {
@@ -41,17 +51,23 @@ function History() {
           status: "Verified",
         }));
         setHistoryData(formattedHistory);
+        setFilteredHistory(formattedHistory);
         setLoading(false);
       } catch (error) {
         console.error("Error fetching history:", error);
-        setLoading(false);
-      } finally {
         setLoading(false);
       }
     };
 
     fetchHistory();
   }, []);
+
+  const handleSearch = () => {
+    const filtered = historyData.filter((item) =>
+      item.name.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+    setFilteredHistory(filtered);
+  };
 
   return (
     <>
@@ -60,9 +76,28 @@ function History() {
         <Row>
           <Col md="12">
             <Card className="strpied-tabled-with-hover">
-              <Card.Header>
-                <Card.Title as="h4">Verification History</Card.Title>
-              </Card.Header>
+              <div className="d-space-between">
+                <Card.Header>
+                  <Card.Title as="h4">Verification History</Card.Title>
+                </Card.Header>
+                <Card.Header>
+                  <Form.Group className="d-flex">
+                    <Form.Control
+                      type="text"
+                      placeholder="Search..."
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                    />
+                    <Button
+                      variant="danger"
+                      className="btn-fill pull-right py-1"
+                      onClick={handleSearch}
+                    >
+                      <i className="fa fa-search text-white"></i>
+                    </Button>
+                  </Form.Group>
+                </Card.Header>
+              </div>
               <Card.Body className="table-full-width table-responsive px-0">
                 <Table className="table-hover table-striped">
                   <thead>
@@ -75,8 +110,8 @@ function History() {
                     </tr>
                   </thead>
                   <tbody>
-                    {historyData.length > 0 ? (
-                      historyData.map((item) => (
+                    {filteredHistory.length > 0 ? (
+                      filteredHistory.map((item) => (
                         <tr key={item.id}>
                           <td>{item.id}</td>
                           <td>{item.name}</td>

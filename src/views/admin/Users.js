@@ -3,11 +3,21 @@ import Loader from "components/common/Loader";
 import React, { useState, useEffect } from "react";
 import { toast, ToastContainer } from "react-toastify";
 import { collection, getDocs } from "firebase/firestore";
-import { Card, Table, Container, Row, Col } from "react-bootstrap";
+import {
+  Card,
+  Table,
+  Container,
+  Row,
+  Col,
+  Form,
+  Button,
+} from "react-bootstrap";
 
 function Users() {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [filteredUsers, setFilteredUsers] = useState([]);
 
   useEffect(() => {
     fetchUsers();
@@ -22,12 +32,20 @@ function Users() {
         .filter((user) => !user.is_admin);
 
       setUsers(usersList);
+      setFilteredUsers(usersList);
     } catch (error) {
       console.log("error", error);
       toast.error("Failed to fetch users.");
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleSearch = () => {
+    const results = users.filter((user) =>
+      user.name.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+    setFilteredUsers(results);
   };
 
   return (
@@ -38,10 +56,29 @@ function Users() {
         <Row>
           <Col md="12">
             <Card className="striped-tabled-with-hover">
-              <Card.Header>
-                <Card.Title as="h4">Users List</Card.Title>
-                <p className="card-category">Number of registered users</p>
-              </Card.Header>
+              <div className="d-space-between">
+                <Card.Header>
+                  <Card.Title as="h4">Users List</Card.Title>
+                  <p className="card-category">Number of registered users</p>
+                </Card.Header>
+                <Card.Header>
+                  <Form.Group className="d-flex">
+                    <Form.Control
+                      type="text"
+                      placeholder="Search..."
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                    />
+                    <Button
+                      variant="danger"
+                      className="btn-fill pull-right py-1"
+                      onClick={handleSearch}
+                    >
+                      <i className="fa fa-search text-white"></i>
+                    </Button>
+                  </Form.Group>
+                </Card.Header>
+              </div>
               <Card.Body className="table-full-width table-responsive px-0">
                 <Table className="table-hover table-striped">
                   <thead>
@@ -57,8 +94,8 @@ function Users() {
                     </tr>
                   </thead>
                   <tbody>
-                    {users.length > 0 ? (
-                      users.map((user, index) => (
+                    {filteredUsers.length > 0 ? (
+                      filteredUsers.map((user, index) => (
                         <tr key={user.id}>
                           <td>{index + 1}</td>
                           <td>{user.name}</td>
