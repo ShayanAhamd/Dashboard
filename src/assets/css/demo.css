@@ -361,6 +361,15 @@
   .fixed-plugin .dropdown .dropdown-menu {
     top: -170px;
   }
+  .white-nowrap-small-screen {
+    white-space: nowrap !important;
+  }
+  .font-small-screen-12 {
+    font-size: 12px !important;
+  }
+  .font-small-screen-10 {
+    font-size: 10px !important;
+  }
 }
 
 .btn-social {

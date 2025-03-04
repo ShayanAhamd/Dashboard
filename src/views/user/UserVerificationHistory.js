@@ -141,12 +141,17 @@ function UserVerificationHistory() {
       <div className="container-fluid pt-3 is-cable-bg">
         <br />
         <div className="row px-4 py-3 d-center">
-          <div className="col-8 bg-transparent d-space-between">
-            <h3 style={{ fontWeight: "bolder" }}>Verification History</h3>
-            <div>
+          <div className="col-md-8 col-12 bg-transparent d-space-between">
+            <h3
+              className="font-small-screen-12"
+              style={{ fontWeight: "bolder" }}
+            >
+              Verification History
+            </h3>
+            <div className="d-flex">
               <Button
                 variant="default"
-                className="btn-fill btn-sm"
+                className="btn-fill btn-sm font-small-screen-10 white-nowrap-small-screen"
                 style={{ marginRight: 8 }}
                 onClick={handleShow}
               >
@@ -154,7 +159,7 @@ function UserVerificationHistory() {
               </Button>
               <Link
                 to="/edit-user"
-                className="btn text-white"
+                className="btn text-white font-small-screen-10 white-nowrap-small-screen"
                 style={{
                   fontSize: 12,
                   border: "none",
@@ -165,7 +170,7 @@ function UserVerificationHistory() {
               </Link>
               <Link
                 onClick={handleLogout}
-                className="btn text-white"
+                className="btn text-white font-small-screen-10 white-nowrap-small-screen"
                 style={{
                   fontSize: 12,
                   border: "none",
@@ -178,7 +183,7 @@ function UserVerificationHistory() {
               </Link>
             </div>
           </div>
-          <div className="col-8 bg-transparent d-space-between">
+          <div className="col-md-8 col-12 bg-transparent d-space-between">
             <Container fluid>
               <Row>
                 <Col md="12" className="px-0">

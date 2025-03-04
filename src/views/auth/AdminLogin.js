@@ -52,7 +52,7 @@ function AdminLogin() {
       <div className="container-fluid pt-5 is-cable-bg">
         <div className="row px-4 py-3 d-center mt-3">
           <div
-            className="col-4 border bg-white shadow"
+            className="col-md-4 col-12 border bg-white shadow"
             style={{ borderRadius: "20px" }}
           >
             <div className="d-center pt-3">

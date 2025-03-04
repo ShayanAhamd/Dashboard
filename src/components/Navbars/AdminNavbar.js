@@ -55,8 +55,8 @@ function Header() {
           >
             <i className="fas fa-ellipsis-v"></i>
           </Button>
-          <Navbar.Brand as={Link} to="/admin" className="me-2">
-            {getBrandText()}
+          <Navbar.Brand as={Link} to="/admin/dashboard" className="me-2">
+            Admin Dashboard
           </Navbar.Brand>
         </div>
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
