@@ -199,7 +199,7 @@ function Dashboard() {
     <>
       <Container fluid>
         <Row>
-          <Col lg="3" sm="6">
+          <Col lg="4" sm="6">
             <Card
               className="card-stats hover-effect"
               style={{
@@ -229,7 +229,7 @@ function Dashboard() {
             </Card>
           </Col>
 
-          <Col lg="3" sm="6">
+          <Col lg="4" sm="6">
             <Card
               className="card-stats hover-effect"
               style={{
@@ -259,7 +259,7 @@ function Dashboard() {
             </Card>
           </Col>
 
-          <Col lg="3" sm="6">
+          <Col lg="4" sm="6">
             <Card
               className="card-stats hover-effect"
               style={{
@@ -277,7 +277,7 @@ function Dashboard() {
                   <Col xs="7">
                     <div className="numbers">
                       <p className="card-category">Verifications</p>
-                      <Card.Title as="h4">23</Card.Title>
+                      <Card.Title as="h4">{codeStats.usedCodes}</Card.Title>
                     </div>
                   </Col>
                 </Row>
@@ -285,36 +285,6 @@ function Dashboard() {
               <Card.Footer>
                 <hr />
                 <div className="stats">Total verifications completed</div>
-              </Card.Footer>
-            </Card>
-          </Col>
-
-          <Col lg="3" sm="6">
-            <Card
-              className="card-stats hover-effect"
-              style={{
-                background: "linear-gradient(135deg, #f093fb, #f5576c)",
-                color: "#fff",
-              }}
-            >
-              <Card.Body>
-                <Row>
-                  <Col xs="5">
-                    <div className="icon-big text-center icon-warning">
-                      <i className="fa fa-globe text-white"></i>
-                    </div>
-                  </Col>
-                  <Col xs="7">
-                    <div className="numbers">
-                      <p className="card-category">Active Sessions</p>
-                      <Card.Title as="h4">{activeSessions}</Card.Title>
-                    </div>
-                  </Col>
-                </Row>
-              </Card.Body>
-              <Card.Footer>
-                <hr />
-                <div className="stats">Currently active users</div>
               </Card.Footer>
             </Card>
           </Col>

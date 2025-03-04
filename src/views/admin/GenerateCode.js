@@ -122,7 +122,8 @@ function GenerateCode() {
       return;
     }
 
-    const codesArray = generatedCode.split(", ").map((code) => ({
+    const codesArray = generatedCode.split(", ").map((code, index) => ({
+      id: `${Date.now()}_${index}`,
       code,
       points: parseInt(points, 10),
       created_at: new Date(),
@@ -134,13 +135,18 @@ function GenerateCode() {
 
     try {
       setLoading(true);
+      const savedCodes = [];
+
       for (const code of codesArray) {
-        await addDoc(collection(db, "codes"), code);
+        const docRef = await addDoc(collection(db, "codes"), code);
+        savedCodes.push({ ...code, id: docRef.id });
       }
+
       setGeneratedCode("");
       setTotalCodes("");
       setPoints("");
       toast.success("Codes saved successfully!");
+      exportToCSV(savedCodes, "generated_codes.csv");
     } catch (error) {
       console.error("Error saving codes:", error);
       toast.error("Failed to save codes.");

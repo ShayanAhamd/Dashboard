@@ -175,7 +175,7 @@ function Users() {
 
       {/* Modal for user details */}
       <Modal show={showModal} onHide={() => setShowModal(false)} size="lg">
-        <Modal.Header closeButton>
+        <Modal.Header closeButton className="pt-0">
           <Modal.Title>Used Codes</Modal.Title>
         </Modal.Header>
         <Modal.Body>
@@ -190,7 +190,7 @@ function Users() {
                       <th>#</th>
                       <th>Code</th>
                       <th>Verification Date</th>
-                      <th>Status</th>
+                      <th>Points</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -199,7 +199,7 @@ function Users() {
                         <td>{index + 1}</td>
                         <td>{code.code}</td>
                         <td>{code.verificationDate}</td>
-                        <td>Verified</td>
+                        <td>{code.points}</td>
                       </tr>
                     ))}
                   </tbody>

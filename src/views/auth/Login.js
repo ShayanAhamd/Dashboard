@@ -69,7 +69,7 @@ function Login() {
         } else {
           navigate("/user-history");
         }
-      }, 2000);
+      }, 1000);
     } catch (error) {
       toast.error("Invalid email or password.");
     } finally {
@@ -110,25 +110,28 @@ function Login() {
               onSubmit={handleLogin}
             >
               <input
+                required
                 type="email"
                 value={email}
+                disabled={loading}
                 className="form-control"
-                required
                 placeholder="Email Address"
                 onChange={(e) => setEmail(e.target.value)}
               />
               <br />
               <input
+                required
                 type="password"
                 value={password}
+                disabled={loading}
                 placeholder="Password"
                 className="form-control"
-                required
                 onChange={(e) => setPassword(e.target.value)}
               />
               <br />
               <button
                 type="submit"
+                disabled={loading}
                 className="btn w-100 text-white"
                 style={{
                   fontSize: 12,

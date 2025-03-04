@@ -165,13 +165,13 @@ function UserVerificationHistory() {
               </Link>
               <Link
                 onClick={handleLogout}
-                className="btn text-dark"
+                className="btn text-white"
                 style={{
                   fontSize: 12,
                   border: "none",
                   marginLeft: 10,
-                  backgroundColor: "red",
-                  border: "1px solid black",
+                  backgroundColor: "#000",
+                  border: "1px solid #000",
                 }}
               >
                 Logout
