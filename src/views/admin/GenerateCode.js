@@ -9,12 +9,12 @@ import {
   Pagination,
 } from "react-bootstrap";
 import {
-  collection,
+  doc,
   addDoc,
   deleteDoc,
-  doc,
   updateDoc,
   onSnapshot,
+  collection,
 } from "firebase/firestore";
 import Swal from "sweetalert";
 import { Tooltip } from "react-tooltip";
@@ -32,7 +32,6 @@ function GenerateCode() {
   const [codesList, setCodesList] = useState([]);
   const [totalCodes, setTotalCodes] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const [deleteMultiple, setDeleteMultiple] = useState(false);
   const [generatedCode, setGeneratedCode] = useState("");
   const [selectedCodes, setSelectedCodes] = useState([]);
 
@@ -122,8 +121,7 @@ function GenerateCode() {
       return;
     }
 
-    const codesArray = generatedCode.split(", ").map((code, index) => ({
-      id: `${Date.now()}_${index}`,
+    const codesArray = generatedCode.split(", ").map((code) => ({
       code,
       points: parseInt(points, 10),
       created_at: new Date(),
@@ -142,6 +140,7 @@ function GenerateCode() {
         savedCodes.push({ ...code, id: docRef.id });
       }
 
+      setCodesList((prev) => [...prev, ...savedCodes]);
       setGeneratedCode("");
       setTotalCodes("");
       setPoints("");
@@ -292,20 +291,6 @@ function GenerateCode() {
                       Delete Selected
                     </Button>
                   )}
-                  {codesList.length > 0 && (
-                    <Card.Title className="mr-4" as="h6">
-                      <Button
-                        variant="success"
-                        className="btn-sm"
-                        style={{ marginLeft: 10 }}
-                        onClick={() =>
-                          exportToCSV(codesList, "generated_codes.csv")
-                        }
-                      >
-                        Download CSV
-                      </Button>
-                    </Card.Title>
-                  )}
                 </div>
               </Card.Header>
               <Card.Body className="table-full-width table-responsive px-0">
@@ -330,11 +315,25 @@ function GenerateCode() {
                       currentItems.map((item, index) => (
                         <tr key={item.id}>
                           <td>
-                            <Form.Check
-                              type="checkbox"
-                              checked={selectedCodes.includes(item.id)}
-                              onChange={() => handleSelectCode(item.id)}
-                            />
+                            <span
+                              data-tooltip-id={`used-checkbox-tooltip-${item.id}`}
+                            >
+                              <Form.Check
+                                type="checkbox"
+                                disabled={item.is_used}
+                                checked={selectedCodes.includes(item.id)}
+                                onChange={() => handleSelectCode(item.id)}
+                              />
+                            </span>
+                            {item.is_used && (
+                              <Tooltip
+                                id={`used-checkbox-tooltip-${item.id}`}
+                                place="top"
+                              >
+                                This code has already been used and cannot be
+                                modified.
+                              </Tooltip>
+                            )}
                           </td>
                           <td>{indexOfFirstItem + index + 1}</td>
                           <td>{item.code}</td>
@@ -398,7 +397,7 @@ function GenerateCode() {
                       ))
                     ) : (
                       <tr>
-                        <td colSpan="8" className="text-center">
+                        <td colSpan="9" className="text-center">
                           No codes generated yet
                         </td>
                       </tr>
